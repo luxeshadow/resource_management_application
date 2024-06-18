@@ -21,43 +21,84 @@ use App\Http\Controllers\UserController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('registe');
 
-// Route pour gérer le processus d'inscription
-Route::post('/register', [RegisterController::class, 'register']);
-Route::get('/notification', [AssignationController::class,'getAssignmentsDueToday']);
+
+//Route for the login page (Added By Other Person)
+Route::get('/connexion', [UserController::class, 'showLoginForm'])->name('auth.login');
+Route::post('/connexion', [UserController::class, 'login'])->name('auth.verification');
+Route::get('/logout', [UserController::class, 'logout'])->name('auth.logout');
+
+Route::resource('users', UserController::class);
+
+//Your Owner Route to access to Connnexion Page
+/*
 Route::get('/connexion', function () {
     return view('Connexion');
 })->name('connexion');
-Route::get('/Historique', [AssignationController::class,'Historique'])->name('historique');
-Route::post('/addmember', [AssignationController::class,'addmember'])->name('addmember');
-Route::get('/Employer', [HomeController::class,'CreateEmployer'])->name('CreateEmployer');
-Route::get('/liste', [HomeController::class,'listeEmployers'])->name('listeEmployers');
-Route::get('/Projet', [HomeController::class,'CreateProjet'])->name('CreateProjet');
-Route::get('/Profile', [HomeController::class,'showprofile'])->name('showprofile');
-Route::get('/Users', [HomeController::class,'createUsers'])->name('createUsers');
-Route::get('/Home', [ EmployeeController::class,'getDashboardData'])->name('accueil');
-
-//Route des Assignation
-
-Route::get('/Equipe', [HomeController::class,'Equipe'])->name('Equipe');
-Route::get('/Equipe&Projet', [AssignationController::class, 'index'])->name('Equipe&Projet');
-Route::get('/projets/en-cours-ou-nuls', [ProjetController::class, 'getProjetsEnCoursOuNuls']);
-Route::get('employees/disponibilite/null', [EmployeeController::class, 'getEmployeesWithNullDisponibilite']);
-Route::get('/listecompetence', [CompetenceController::class,'listecompetence']);
-Route::get('/listesector', [SectorController::class,'listesector']);
+*/
 
 
-//Ressource
 
-Route::resource('employees', EmployeeController::class);
-Route::resource('projets', ProjetController::class);
-Route::resource('assignations', AssignationController::class);
-Route::post('/projets/archive/{id}', [AssignationController::class, 'archive'])->name('projets.archive');
-Route::resource('users', UserController::class);
-Route::resource('sectors', SectorController::class);
-Route::resource('competences', CompetenceController::class);
 
+Route::middleware('auth')->group(function () {
+    Route::get('/Historique', [AssignationController::class, 'Historique'])->name('historique');
+    Route::post('/addmember', [AssignationController::class, 'addmember'])->name('addmember');
+    Route::get('/Employer', [HomeController::class, 'CreateEmployer'])->name('CreateEmployer');
+    Route::get('/liste', [HomeController::class, 'listeEmployers'])->name('listeEmployers');
+    Route::get('/Projet', [HomeController::class, 'CreateProjet'])->name('CreateProjet');
+    Route::get('/Profile', [HomeController::class, 'showprofile'])->name('showprofile');
+    Route::get('/Home', [EmployeeController::class, 'getDashboardData'])->name('accueil');
+    
+    
+    
+    // Route des Assignation
+    Route::get('/Equipe', [HomeController::class, 'Equipe'])->name('Equipe');
+    Route::get('/Equipe&Projet', [AssignationController::class, 'index'])->name('Equipe&Projet');
+    Route::get('/projets/en-cours-ou-nuls', [ProjetController::class, 'getProjetsEnCoursOuNuls']);
+    Route::get('employees/disponibilite/null', [EmployeeController::class, 'getEmployeesWithNullDisponibilite']);
+    Route::get('/listecompetence', [CompetenceController::class, 'listecompetence']);
+    Route::get('/listesector', [SectorController::class, 'listesector']);
+    Route::get('/notification', [AssignationController::class, 'getAssignmentsDueToday'])->name('notification');
+    // Ressource
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('projets', ProjetController::class);
+    Route::resource('assignations', AssignationController::class);
+    Route::post('/projets/archive/{id}', [AssignationController::class, 'archive'])->name('projets.archive');
+    
+    Route::resource('sectors', SectorController::class);
+    Route::resource('competences', CompetenceController::class);
+});
+
+/*
+The Previous Delete Code is here
+Route::middleware('auth')->group(function () {
+    Route::get('/Historique', [AssignationController::class, 'Historique'])->name('historique');
+    Route::post('/addmember', [AssignationController::class, 'addmember'])->name('addmember');
+    Route::get('/Employer', [HomeController::class, 'CreateEmployer'])->name('CreateEmployer');
+    Route::get('/liste', [HomeController::class, 'listeEmployers'])->name('listeEmployers');
+    Route::get('/Projet', [HomeController::class, 'CreateProjet'])->name('CreateProjet');
+    Route::get('/Profile', [HomeController::class, 'showprofile'])->name('showprofile');
+    Route::get('/Users', [HomeController::class, 'createUsers'])->name('createUsers');
+    Route::get('/Home', [EmployeeController::class, 'getDashboardData'])->name('accueil');
+    
+    // Route des Assignation
+    Route::get('/Equipe', [HomeController::class, 'Equipe'])->name('Equipe');
+    Route::get('/Equipe&Projet', [AssignationController::class, 'index'])->name('Equipe&Projet');
+    Route::get('/projets/en-cours-ou-nuls', [ProjetController::class, 'getProjetsEnCoursOuNuls']);
+    Route::get('employees/disponibilite/null', [EmployeeController::class, 'getEmployeesWithNullDisponibilite']);
+    Route::get('/listecompetence', [CompetenceController::class, 'listecompetence']);
+    Route::get('/listesector', [SectorController::class, 'listesector']);
+    
+    // Ressource
+    Route::resource('employees', EmployeeController::class);
+    Route::resource('projets', ProjetController::class);
+    Route::resource('assignations', AssignationController::class);
+    Route::post('/projets/archive/{id}', [AssignationController::class, 'archive'])->name('projets.archive');
+    Route::resource('users', UserController::class);
+    Route::resource('sectors', SectorController::class);
+    Route::resource('competences', CompetenceController::class);
+});
+*/
 
 //Langue
 

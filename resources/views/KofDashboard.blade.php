@@ -155,7 +155,7 @@
                             </a>
                             <ul class="cat-sub-menu">
                                 <li>
-                                    <a href="{{ route('createUsers') }}">Create User</a>
+                                    <a href="{{ route('users.create') }}">Create User</a>
                                 </li>
                                 <li>
                                     <a href="users-02.html">Edit User</a>
@@ -163,6 +163,7 @@
                             </ul>
                         </li>
                        
+                        
                     </ul>
                     <br>
                     <br>
@@ -260,7 +261,7 @@
                                         <span>Profile</span>
                                     </a></li>
                                
-                                <li><a class="danger" href="">
+                                <li><a class="danger" href="{{ route('auth.logout') }}">
                                         <i data-feather="log-out" aria-hidden="true"></i>
                                         <span>Log out</span>
                                     </a></li>

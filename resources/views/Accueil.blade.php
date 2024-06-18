@@ -45,17 +45,7 @@
             /* Adjust size as needed */
         }
     </style>
-     <script>
-        window.addEventListener('load', () => {
-          const spinner = document.querySelector('.spinner');
-          const pageCenter = document.querySelector('#page-center');
-    
-          setTimeout(() => {
-            spinner.style.display = 'none';
-            pageCenter.style.opacity = '1';
-          }, 2000); // Temps de chargement du spinner en millisecondes (2 secondes)
-        });
-      </script>
+     
     <div class="spinner"></div>
     <main id="page-center" class="main users chart-page" id="skip-target">
         <div class="container">
@@ -76,7 +66,7 @@
                             url: '/notification',
                             method: 'GET',
                             success: function(data) {
-                               
+                               alert(26262);
                                 if (data.count > 0) {
                                     $('#notificationCount').text(data.count);
                                 

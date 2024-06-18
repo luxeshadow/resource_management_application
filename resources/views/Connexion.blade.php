@@ -17,27 +17,26 @@
     <div class="spinner"><img src="{{ asset('img/log.png') }}" alt=""></div>
 
     <div class="layer"></div>
-    <main class="page-center">
+    <main class="page-center">  
         <article class="sign-up">
             <h1 class="sign-up__title">Content de te revoir!</h1>
             <p style="font-weight:700;" class="sign-up__subtitle">Connectez-vous à votre compte pour continuer</p>
-            <form style="width: 400px;"class="sign-up-form form col-xl-12" action="" method="">
+            <form style="width: 400px;" class="sign-up-form form col-xl-12" action="{{ route('auth.verification') }}" method="POST">
+                @csrf <!-- Ajout du jeton CSRF pour la protection contre les attaques CSRF -->
                 <label style="font-weight:700;" class="form-label-wrapper">
                     <p  class="form-label">Email</p>
-                    <input name="email" class="form-input" type="email" placeholder="Entrer l'email">
+                    <input name="email" class="form-input" type="" placeholder="Entrer l'email" autocomplete="off">
                     <div style="color: red;" class="error-message"></div>
                 </label>
                 <label class="form-label-wrapper">
                     <p class="form-label">Mots de passe</p>
-                    <input class="form-input" id="password" name="password" placeholder="Saisissez votre mot de passe">
+                    <input class="form-input" type="password" id="password" name="password" placeholder="Saisissez votre mot de passe" autocomplete="off">
                     <button style="background: none; font-size: 30px;color: #A39B9B" type="button"
                         class="toggle-password">&#128065</button>
                     <div style="color: red;" class="error-message"></div>
                 </label>
 
-
-
-                <button style="background-color:#002147;" class="form-btn primary-default-btn transparent-btn">Connexion</button>
+                <button style="background-color:#002147;" class="form-btn primary-default-btn transparent-btn" type="submit">Connexion</button>
             </form>
         </article>
     </main>
