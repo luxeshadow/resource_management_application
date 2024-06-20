@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,9 +14,10 @@
     <!-- Custom styles -->
     <link rel="stylesheet" href="./css/style.min.css">
 
+    <script src="{{ asset('js/jquery.js') }}"></script>
 </head>
 
-<body>
+<body style="font-family: 'Segoe UI';">
     <div class="spinner"><img src="{{ asset('img/log.png') }}" alt=""></div>
 
     <div class="layer"></div>
@@ -23,19 +27,30 @@
             <p style="font-weight:700;" class="sign-up__subtitle">Connectez-vous à votre compte pour continuer</p>
             <form style="width: 400px;" class="sign-up-form form col-xl-12" action="{{ route('auth.verification') }}" method="POST">
                 @csrf <!-- Ajout du jeton CSRF pour la protection contre les attaques CSRF -->
+                
+               
+                @if ($errors->has('authentication'))
+                <p style="color: red;" class="error-message">
+                    {{ $errors->first('authentication') }}
+                </p>
+               @endif
+            
                 <label style="font-weight:700;" class="form-label-wrapper">
-                    <p  class="form-label">Email</p>
-                    <input name="email" class="form-input" type="" placeholder="Entrer l'email" autocomplete="off">
-                    <div style="color: red;" class="error-message"></div>
+                    <p class="form-label">Email</p>
+                    <input required name="email" class="form-input" type="email" placeholder="Entrer l'email" autocomplete="off" value="{{ old('email') }}">
+                         {{--@if ($errors->has('email'))
+                        <div style="color: red;" class="error-message">{{ $errors->first('email') }}</div>
+                         @endif --}}
                 </label>
+               
+                
                 <label class="form-label-wrapper">
                     <p class="form-label">Mots de passe</p>
-                    <input class="form-input" type="password" id="password" name="password" placeholder="Saisissez votre mot de passe" autocomplete="off">
-                    <button style="background: none; font-size: 30px;color: #A39B9B" type="button"
-                        class="toggle-password">&#128065</button>
-                    <div style="color: red;" class="error-message"></div>
+                    <input required class="form-input" type="password" id="password" name="password" placeholder="Saisissez votre mot de passe" autocomplete="off">
+                    <button style="background: none; font-size: 30px;color: #A39B9B" type="button" class="toggle-password">&#128065;</button>
+                 
                 </label>
-
+                
                 <button style="background-color:#002147;" class="form-btn primary-default-btn transparent-btn" type="submit">Connexion</button>
             </form>
         </article>
@@ -56,9 +71,11 @@
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
 
+          
+
         });
     </script>
-
+   
     <script>
         window.addEventListener('', () => {
             const spinner = document.querySelector('.spinner');
@@ -67,7 +84,7 @@
             setTimeout(() => {
                 spinner.style.display = 'none';
                 pageCenter.style.opacity = '1';
-            }, 500); // Temps de chargement du spinner en millisecondes (2 secondes)
+            }, 100); // Temps de chargement du spinner en millisecondes (2 secondes)
         });
     </script>
     <style>
@@ -134,20 +151,12 @@
 
         .toggle-password {
             position: absolute;
-            top: 60%;
-
+           margin-top: 40px;
             right: 60px;
-            transform: translateY(-50%);
+          
             cursor: pointer;
         }
 
-        .toggle-password button {
-            transition: all 0.2s ease-in-out;
-        }
-
-        .toggle-password:hover button {
-            transform: rotate(90deg);
-        }
     </style>
 </body>
 

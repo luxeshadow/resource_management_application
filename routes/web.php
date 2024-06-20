@@ -28,7 +28,7 @@ Route::get('/connexion', [UserController::class, 'showLoginForm'])->name('auth.l
 Route::post('/connexion', [UserController::class, 'login'])->name('auth.verification');
 Route::get('/logout', [UserController::class, 'logout'])->name('auth.logout');
 
-Route::resource('users', UserController::class);
+
 
 //Your Owner Route to access to Connnexion Page
 /*
@@ -40,7 +40,7 @@ Route::get('/connexion', function () {
 
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth','nocache')->group(function () {
     Route::get('/Historique', [AssignationController::class, 'Historique'])->name('historique');
     Route::post('/addmember', [AssignationController::class, 'addmember'])->name('addmember');
     Route::get('/Employer', [HomeController::class, 'CreateEmployer'])->name('CreateEmployer');
@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
     
     // Route des Assignation
     Route::get('/Equipe', [HomeController::class, 'Equipe'])->name('Equipe');
-    Route::get('/Equipe&Projet', [AssignationController::class, 'index'])->name('Equipe&Projet');
+    Route::get('/EquipeProjet', [AssignationController::class, 'index'])->name('Equipe&Projet');
     Route::get('/projets/en-cours-ou-nuls', [ProjetController::class, 'getProjetsEnCoursOuNuls']);
     Route::get('employees/disponibilite/null', [EmployeeController::class, 'getEmployeesWithNullDisponibilite']);
     Route::get('/listecompetence', [CompetenceController::class, 'listecompetence']);
@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function () {
     
     Route::resource('sectors', SectorController::class);
     Route::resource('competences', CompetenceController::class);
+    Route::resource('users', UserController::class);
 });
 
 /*

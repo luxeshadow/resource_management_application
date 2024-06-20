@@ -397,11 +397,21 @@
                         },
                         success: function(response) {
                             // Afficher une alerte SweetAlert de succès
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Succès!',
-                                text: response.message,
-                            });
+                            const Toast = Swal.mixin({
+                            toast: true,
+                            position: "top-center",
+                            showConfirmButton: false,
+                            timer: 1000,
+                            timerProgressBar: true,
+                            didOpen: (toast) => {
+                                toast.onmouseenter = Swal.stopTimer;
+                                toast.onmouseleave = Swal.resumeTimer;
+                            }
+                        });
+                        Toast.fire({
+                            icon: "success",
+                            title: "Signed in successfully"
+                        });
                             $('#selectProjet').val('');
                             $('input[name="date"]').val('');
                             selectedEmployeeIds.clear();

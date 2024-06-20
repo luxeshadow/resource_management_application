@@ -11,16 +11,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 
+
 class UserController extends Controller
 {
+    // effacer le cache
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $response = $next($request);
+            return $response->header('Cache-Control', 'no-cache, no-store, max-age=0, must-revalidate')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', 'Sat, 01 Jan 2000 00:00:00 GMT');
+        });
+    }
     /**
      * Display a listing of the resource.
      */
-   /* public function index()
+    /* public function index()
     {
         return view ('users_register');
     }*/
-   public function index()
+    public function index()
     {
         $users = User::all();
         return response()->json($users);
@@ -47,18 +58,31 @@ class UserController extends Controller
             'password' => 'required',
         ]);
 
-        
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+
+            // Récupérer l'utilisateur authentifié
+            $user = Auth::user();
+
+            // Stocker les informations de l'utilisateur dans la session
+            $request->session()->put('user', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'telephone' => $user->telephone,
+                'photo' => $user->photo, // Assurez-vous que l'utilisateur a un champ 'photo'
+            ]);
+           
+            // Rediriger vers la page d'accueil
             return redirect()->intended('/Home');
         }
 
         return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
+            'authentication' => 'L\'adresse e-mail ou le mot de passe est incorrect.',
         ]);
     }
+
 
     public function registerForm()
     {
@@ -70,25 +94,7 @@ class UserController extends Controller
         return view('users_register');
     }
 
-    /*
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
 
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('Accueil');
-        }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ]);
-    }*/
 
     public function logout(Request $request)
     {
@@ -117,8 +123,6 @@ class UserController extends Controller
         ]);
 
         dd('ok!!');
-
-        
     }
 
     /**
@@ -134,16 +138,37 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        //
+        return response()->json($user);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdateUserRequest $request, User $user)
     {
-        //
+        // Valider les données reçues via le formulaire
+        $validatedData = $request->validated();
+
+        // Mettre à jour les attributs de l'utilisateur
+        $user->name = $validatedData['name'];
+        $user->email = $validatedData['email'];
+        $user->telephone = $validatedData['telephone'];
+
+        // Si un nouveau mot de passe est fourni, le hasher et le sauvegarder
+        if (!empty($validatedData['password'])) {
+            $user->password = Hash::make($validatedData['password']);
+        }
+
+        // Si une nouvelle photo est fournie, la sauvegarder
+        if ($request->hasFile('photo')) {
+            $photoPath = $request->file('photo')->store('photos', 'public');
+            $user->photo = $photoPath;
+        }
+
+        // Sauvegarder les modifications
+        $user->save();
+
+        // Retourner une réponse JSON avec un message de succès
+        return response()->json(['message' => 'Profil utilisateur mis à jour avec succès']);
     }
+
 
     /**
      * Remove the specified resource from storage.

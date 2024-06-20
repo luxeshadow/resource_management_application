@@ -171,7 +171,7 @@ class EmployeeController extends Controller
                 return response()->json(['message' => 'Employé supprimé avec succès']);
            
         } else{
-            return response()->json(['message' => 'l\'employé ne peut pas etre suorimer car il es assigner a un projet actuellement'], 500);
+            return response()->json(['message' => 'l\'employé ne peut pas etre suprimer car il es assigner a un projet actuellement'], 500);
         }
        
     }

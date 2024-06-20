@@ -3,6 +3,9 @@
 @section('employer')
 
     <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+     <meta http-equiv="Pragma" content="no-cache" />
+     <meta http-equiv="Expires" content="0" />
 
         <script src="{{ asset('js/jquery.js') }}"></script>
         <script src="{{ asset('js/employee.js') }}"></script>
@@ -171,14 +174,10 @@
 
 
 
-        {{-- --------------- MODALE SECTOR FIN -------------------------- --}}
-
-        {{-- ---------------------- MODALE COMPETENCES --------------------- --}}
+        {{-- --------------- MODALE FIN -------------------------- --}}
 
 
 
-
-        {{-- --------------- MODALE COMPETENCE FIN -------------------------- --}}
 
         {{-- -------------------------- MODAL ------------------------- --}}
         <section>
@@ -215,8 +214,8 @@
         {{-- -------------------------- MODAL MODIFIER EMPLOYER ------------------------- --}}
         <section>
 
-            <div id="editModal" class="modal">
-                <div class="sign-up-form form container col-xl-6">
+            <div  id="editEmployeeModal" class="modal1">
+                <div style="margin-top: 15px;margin-bottom: 15px;" class="sign-up-form form container col-xl-6">
                     <span class="close">&times;</span>
                     <form id="modifierEmployer">
                         @csrf
@@ -229,30 +228,16 @@
                             <div style="color: red;" class="error-message"></div>
                         </label>
                         <label class="form-label-wrapper">
-                            <p class="form-label">Telephone</p>
-                            <input name="telephone" id="edit-telephone" class="form-input" placeholder="Enter le telephone">
+                            <p class="form-label">Email</p>
+                            <input name="telephone" id="edit-telephone" class="form-input" placeholder="Enter le email" autocomplete="off" value="{{ old('email') }}">
                             <div style="color: red;" class="error-message"></div>
                         </label>
                         <label class="form-label-wrapper">
                             <p class="form-label">Telephone</p>
-                            <input name="email" id="edit-email" class="form-input" placeholder="Enter le telephone">
+                            <input name="email" id="edit-email" class="form-input" placeholder="Enter le telephone" autocomplete="off">
                             <div style="color: red;" class="error-message"></div>
                         </label>
-                        <label class="form-label-wrapper">
-                            <p class="form-label">Secteur d'Activite</p>
-                            <select name="secteur" id="edit-secteur" class="form-input" title="Open list">
-                                <option value="" disabled selected hidden></option>
-                                <option value="dev mobile">DEV MOBILE</option>
-                                <option value="dev web">DEV WEB</option>
-                            </select>
-                            <div style="color: red;" class="error-message"></div>
-                        </label>
-                        <label class="form-label-wrapper">
-                            <p class="form-label">Competence</p>
-                            <input name="competence" id="edit-competence" class="form-input"
-                                placeholder="Laravel JavaScript ReactNative...">
-                            <div style="color: red;" class="error-message"></div>
-                        </label>
+                  
                         <button type="submit" class="form-btn primary-default-btn transparent-btn col-md-8">Modifier
                             Employer</button>
                     </form>
@@ -371,10 +356,55 @@
                         reader.readAsDataURL(this.files[0]);
                     }
                 });
+
+                //modifier
+                $(document).on('click', '.btn-edit', function() {
+                        var employeeId = $(this).data('id');
+                        $('#editEmployeeModal').show();
+                        
+
+            // Utiliser AJAX pour récupérer les données de l'employé à modifier
+            $.ajax({
+                url: '/get_employee_data/' + employeeId, // Remplacez cette URL par l'URL de votre endpoint pour récupérer les données de l'employé
+                type: 'GET',
+                success: function(response) {
+                    // Pré-remplir les champs du formulaire de modification avec les données de l'employé
+                    $('#edit_employee_id').val(response.id);
+                    $('#edit_name').val(response.nom);
+                    $('#edit_telephone').val(response.telephone);
+                    $('#edit_email').val(response.email);
+
+                    // Pré-cocher les secteurs d'activité sélectionnés
+                    var selectedSecteursIds = response.selectedSecteursIds.split(',');
+                    selectedSecteursIds.forEach(function(secteurId) {
+                        $('#editSelectedSecteursIds input[value="' + secteurId + '"]').prop('checked', true);
+                    });
+
+                    // Pré-cocher les compétences sélectionnées
+                    var selectedCompetencesIds = response.selectedCompetencesIds.split(',');
+                    selectedCompetencesIds.forEach(function(competenceId) {
+                        $('#editSelectedCompetencesIds input[value="' + competenceId + '"]').prop('checked', true);
+                    });
+
+                    // Ouvrir le modal de modification
+                    $('#editEmployeeModal').show();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Erreur lors de la récupération des données de l\'employé à modifier:', error);
+                }
+            });
+            $('.close').click(function() {
+        $('#editEmployeeModal').hide();
+    });
+        });
+        
+
+                //suprimer
+
                 $(document).on('click', '.btn-del', function() {
                     var id = $(this).data('id');
                     var row = $(this).closest('tr');
-
+                   
                     Swal.fire({
                         title: "Etes vous sure?",
                         text: "Vous allez supprimer un employer!",
@@ -425,9 +455,7 @@
 
                     });
                 });
-
-               
-
+         
                 loadEmployers();
                 // Fonction pour charger et afficher les employeurs
                 let allEmployers = [];
@@ -467,7 +495,7 @@
                     <td>
                         <button title="Supprimer" class="btn-del" data-id="${employer.id}"><img src="img/sup.png" alt="" style="width:22px;"></button>
                         <span class="sr-only">Supprimer</span>
-                        <button title="Modifier" class="btn-edit" data-id="${employer.id}"><img src="img/edit.png" alt="" style="width: 25px;"></button>
+                        <button title="Modifier" id="editEmployeeModal" class="btn-edit" data-id="${employer.id}"><img src="img/edit.png" alt="" style="width: 25px;"></button>
                         <span class="sr-only">Modifier</span>
                         <button title="Voir plus" id="openModalBtn" class="btn-profile" data-id="${employer.id}"><img src="img/profil.png" alt="" style="width: 25px;"></button>
                         <span class="sr-only">Voir plus</span>
@@ -589,10 +617,6 @@
                     });
                 });
 
-
-
-
-
             });
         </script>
 
@@ -605,18 +629,18 @@
                     <label class="form-label-wrapper">
                         <p class="form-label">Nom Complet</p>
                         <input name="nom" id="name" class="form-input" type="text"
-                            placeholder="Entrer nom de l'employer">
+                            placeholder="Entrer nom de l'employer" autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
 
                     <label class="form-label-wrapper">
                         <p class="form-label">Telephone</p>
-                        <input name="telephone" class="form-input" placeholder="Enter le telephone">
+                        <input name="telephone" class="form-input" placeholder="Enter le telephone" autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <label class="form-label-wrapper">
                         <p class="form-label">Email</p>
-                        <input name="email" class="form-input" type="email" placeholder="Entrer l'email">
+                        <input name="email" class="form-input" type="email" placeholder="Entrer l'email" autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <div class="form-label">

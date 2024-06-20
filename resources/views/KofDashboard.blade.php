@@ -2,6 +2,9 @@
 <html lang="en">
 
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+   <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -142,33 +145,41 @@
                             msgCounter.textContent = assignationsCount;
                         </script> --}}
                     </ul>
-                    <span class="system-menu__title">system</span>
+                    
                     <ul class="sidebar-body-menu">
-
                         <li>
-                            <a class="show-cat-btn" href="##">
-                                <span class="icon user-3" aria-hidden="true"></span>Users
-                                <span class="category__btn transparent-btn" title="Open list">
-                                    <span class="sr-only">Open list</span>
-                                    <span class="icon arrow-down" aria-hidden="true"></span>
-                                </span>
-                            </a>
-                            <ul class="cat-sub-menu">
-                                <li>
-                                    <a href="{{ route('users.create') }}">Create User</a>
-                                </li>
-                                <li>
-                                    <a href="users-02.html">Edit User</a>
-                                </li>
-                            </ul>
+                            <a href="##"><span class="icon setting" aria-hidden="true"></span>Settings</a>
                         </li>
-                       
-                        
+                      
+                                <li>
+                                    <a href="{{ route('showprofile') }}">
+                                   
+                                        <span class="icon edit" aria-hidden="true"></span>
+                                            
+                                        <span>Edit User</span>
+                                      
+                                         
+                                            
+                                        </span>
+                                    </a>
+                                </li>
+                             
+                               
                     </ul>
-                    <br>
-                    <br>
-                    <br>
-                    <br>
+
+                    <div class="sidebar-footer">
+                        <a href="##" class="sidebar-user">
+                            <span >
+                            
+                               <img style="border: rgb(211, 216, 216) 1px solid" class="sidebar-user-img" src="{{ asset('storage/' . session('user.photo')) }}" alt="User name">
+                            </span>
+                            <div class="sidebar-user-info">
+                                <span class="sidebar-user__title">{{ session('user.name') }}</span>
+                                <span class="sidebar-user__subtitle">{{ session('user.email') }}</span>
+                            </div>
+                        </a>
+                    </div>
+                   
                 </div>
             </div>
            
@@ -250,6 +261,7 @@
                         
                         <div class="nav-user-wrapper">
                             <button class="dropdown-btn theme-switcher gray-circle-btn" type="button" title="Switch theme">
+                                
                                 <span class="sr-only">My profile</span>
                                     <i data-feather="user" aria-hidden="true"></i>
                             </button>
@@ -308,6 +320,8 @@
             <!-- ! Footer -->
 
         </div>
+
+        
 
         <!-- Chart library -->
         <script src="{{ asset('plugins/chart.min.js') }}"></script>

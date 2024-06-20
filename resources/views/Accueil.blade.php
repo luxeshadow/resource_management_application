@@ -45,8 +45,11 @@
             /* Adjust size as needed */
         }
     </style>
+  
+
+   
      
-    <div class="spinner"></div>
+ 
     <main id="page-center" class="main users chart-page" id="skip-target">
         <div class="container">
             <div style="display: flex">

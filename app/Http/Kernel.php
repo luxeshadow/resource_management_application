@@ -71,6 +71,11 @@ class Kernel extends HttpKernel
         
     ];
 
+    protected $routeMiddleware = [
+        // autres middlewares
+        'nocache' => \App\Http\Middleware\DisableCache::class,
+    ];
+
    
     
 }
