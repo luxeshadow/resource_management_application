@@ -1,7 +1,7 @@
 @extends('KofDashboard')
 
 @section('historique')
-    <link rel="stylesheet" href="{{ asset('css/style.min.css') }}">
+    
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <script src="{{ asset('js/jquery.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -13,12 +13,35 @@
         }
     </style>
     <br>
-    <h2 title="titre" style="background: none;display: flex;margin-left: 30px">
-        <img src="{{ asset('img/his.png') }}" alt="" style="width:60px; height:60px;">
-        <p class="stat-cards-info__num" style="margin-top: 10px;font-weight: 700;font-size: 25px">
-            {{ __('messages.historique') }}
-        </p>
-    </h2>
+    
+    <br>
+
+   
+    <div class="sign-up-form form col-lg-5" style="height: 5px;margin-left: 20px">
+       
+       
+        <input  id="search-input" class="form-input" placeholder="Recherche..." autocomplete="off">
+    
+    </div>
+    
+       
+      
+   
+   
+    <style>
+        #rech-container {
+            position: relative;
+        }
+        #toggle-rech {
+            position: absolute;
+            top: 40%;
+            right: 10px;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+    
+       
+    </style>
 
     @foreach($projets as $projet)
         <main class="stat-cards-item" style="margin: 20px">
@@ -36,7 +59,7 @@
                     </p>
 
                     <p class="stat-cards-info__num">
-                        <span id="date-fin">Date Fin {{ $projet->assignations->first()->date_fin ?? 'N/A' }}</span>
+                        <span id="date-fin">Date Fin {{ $projet->first()->date_fin ?? 'N/A' }}</span>
                     </p>
                     <i style="color: rgb(4, 240, 110);" class="stat-cards-info__num">
                         {{ $projet->status }}...
@@ -79,4 +102,18 @@
         </main>
     @endforeach
     <br>
+    <script>
+        // Fonction de recherche
+        $('#search-input').on('input', function() {
+            var searchTerm = $(this).val().toLowerCase();
+            $('.stat-cards-item').each(function() {
+                var projectName = $(this).find('.overflow-text').text().toLowerCase();
+                if (projectName.includes(searchTerm)) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+    </script>
 @endsection

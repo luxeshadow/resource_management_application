@@ -31,6 +31,7 @@ class StoreUserRequest extends FormRequest
         return [
         'name' => 'required|string|max:255',
         'email' => 'required|string|email|max:255|unique:users',
+        'telephone' => 'required|string',
         'password' => ['required', 'string', 'min:6'],
         'email_verified_at' => 'nullable|date', // Permet de vérifier si la date est au bon format
         'remember_token' => 'nullable|string|max:100', // Peut être vide ou une chaîne de caractères jusqu'à 100 caractères

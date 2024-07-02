@@ -15,9 +15,12 @@ class Projet extends Model
         'typeprojet',
         'description',
         'nomclient',
+        'deletprojet',
         'email',
+        'date_fin',
         'telephone',
         'status',
+        'idtypeprojet',
         
         
     ];
@@ -29,5 +32,11 @@ class Projet extends Model
     {
         return $this->hasMany(Assignation::class);
     }
+    public function typeprojet()
+    {
+        return $this->belongsTo(TypeProjet::class, 'typeprojet', 'id');
+    }
+
+   
 
 }

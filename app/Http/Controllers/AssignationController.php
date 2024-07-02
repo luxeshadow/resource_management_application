@@ -20,9 +20,12 @@ class AssignationController extends Controller
      */
     public function index()
     {
-        // Récupérer toutes les assignations avec les relations projet et employé
-        $projets = Projet::with(['assignations.employe'])
-            ->where('status', 'En cours')
+        // Récupérer tous les projets en cours avec leurs assignations et les employés associés
+        $projets = Projet::where('status', 'En cours')
+            ->with(['assignations' => function ($query) {
+                $query->with('employe');
+            }])
+            ->orderBy('date_fin', 'asc')
             ->get();
     
         // Récupérer tous les employés avec leurs tâches, secteurs, compétences, et projets assignés
@@ -32,6 +35,10 @@ class AssignationController extends Controller
         // Passer les données récupérées à la vue
         return view('Equipe&Projet', compact('projets', 'employees'));
     }
+    
+    
+    
+    
     
 
 
@@ -52,33 +59,27 @@ class AssignationController extends Controller
     public function store(StoreAssignationRequest $request)
     {
         try {
-
             // Récupérer les données validées de la requête
             $data = $request->all();
-
+    
             // Récupérer le projet
-
-
             try {
                 $projet = Projet::findOrFail($data['projet_id']);
             } catch (ModelNotFoundException $e) {
                 // Gérer le cas où le projet n'est pas trouvé
                 return response()->json(['message' => 'Projet non trouvé.'], 404);
             }
-
-
-
+    
             // Ajouter les employés au projet pour la date donnée et mettre à jour leur disponibilité
             foreach ($data['employe_id'] as $employeeId) {
                 $employee = Employee::findOrFail($employeeId);
-
+    
                 // Assigner l'employé au projet pour la date donnée
                 Assignation::create([
                     'projet_id' => $projet->id,
                     'employe_id' => $employee->id,
-                    'date_fin' => $data['date_fin'],
                 ]);
-
+    
                 if (Schema::hasColumn('employees', 'disponibilite')) {
                     Log::info('Avant mise à jour disponibilité', ['employee_id' => $employee->id, 'disponibilite' => $employee->disponibilite]);
                     $employee->update(['disponibilite' => 1]);
@@ -87,15 +88,18 @@ class AssignationController extends Controller
                     Log::warning('Colonne "disponibilite" non trouvée dans la table employees');
                 }
             }
-
+    
+            // Mettre à jour la date_fin dans la table projets
+            $projet->update(['date_fin' => $data['date_fin']]);
             $projet->status = 'En cours';
             $projet->save();
-
+    
             return response()->json(['message' => 'Équipe créée avec succès.'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Erreur lors de la création de l\'équipe.'], 500);
         }
     }
+    
 
 
     public function addmember(StoreAssignationRequest $request)
@@ -237,15 +241,41 @@ public function historique()
 
 public function getAssignmentsDueToday()
 {
-    $today = Carbon::today();
-    $count = Assignation::whereDate('date_fin','<=', $today)
-    ->whereHas('projet', function ($query) {
-        $query->where('status', 'En cours');
-    })
-    ->count();
+    // $today = Carbon::today();
 
-  return response()->json(['count' => $count]);
+    // // Requête pour compter les assignations dont le projet est "En cours" et dont la date de fin est antérieure ou égale à aujourd'hui
+    // $count = Assignation::whereHas('projet', function ($query) use ($today) {
+    //     $query->where('status', 'En cours')
+    //           ->whereDate('date_fin', '<=', $today);
+    // })->count();
+    
+    // return response()->json(['count' => $count]);
+
+
+    $today = Carbon::today();
+
+    // Requête pour récupérer les assignations avec les projets correspondants
+    $assignations = Assignation::whereHas('projet', function ($query) use ($today) {
+        $query->where('status', 'En cours')
+              ->whereDate('date_fin', '<=', $today);
+    })->with('projet')->get();
+
+    // Utiliser distinct('projet_id') pour compter les projets distincts
+    $count = $assignations->pluck('projet_id')->unique()->count();
+
+    // Récupérer les noms des projets
+    $projets = $assignations->map(function($assignation) {
+        return $assignation->projet->nomprojet;
+    })->unique()->values()->all();
+
+    return response()->json(['count' => $count, 'projets' => $projets]);
+
+
+// Requête pour récupérer les assignations avec les projets correspondants
+
+
 }
+
    
     
 }

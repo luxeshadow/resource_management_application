@@ -14,18 +14,26 @@ class CompetenceController extends Controller
     public function index()
     {
         //
-        $competences = Competence::select('id', 'namecompetence')
-            ->whereNull('deletecompetence')
-            ->get();
+        
+        $competence = Competence::select('id', 'namecompetence')
+                 ->whereNull('deletecompetence')
+                 ->get();
 
-        return response()->json($competences);
+        return response()->json($competence);
+         // Placez-le ici pour vérifier les données avant de les renvoyer en JSON
+        
+     
+     
     }
+   
 
     public function listecompetence()
     {
         try {
             // Récupérer toutes les compétences
-            $competences = Competence::all();
+            $competences = Competence::select('id', 'namecompetence','description')
+            ->whereNull('deletecompetence')
+            ->get();
     
             return response()->json(['data' => $competences], 200);
         } catch (\Exception $e) {
@@ -50,20 +58,34 @@ class CompetenceController extends Controller
     {
         //
         try {
-
-
-            // Créer un nouveau projet
-            $competence = Competence::create([
-                'namecompetence' => $request->namecompetence,
-                'description' => $request->description,
-
-            ]);
-
-            return response()->json(['message' => 'nouvelle competence cree', 'employee' => $competence], 201);
+            // Vérifier si la compétence existe déjà
+            $existingCompetence = Competence::where('namecompetence', $request->namecompetence)->first();
+        
+            if ($existingCompetence) {
+                // Vérifier si la colonne deletecompetence est null
+                if ($existingCompetence->deletecompetence !== null) {
+                    // Mettre la colonne deletecompetence à null
+                    $existingCompetence->deletecompetence = null;
+                    $existingCompetence->save();
+                    return response()->json(['message' => 'Compétence ajoutée avec succès'], 200);
+                } else {
+                    // La compétence existe déjà avec deletecompetence null
+                    return response()->json(['error' => 'La compétence existe déjà'], 409);
+                }
+            } else {
+                // Créer une nouvelle compétence
+                $competence = Competence::create([
+                    'namecompetence' => $request->namecompetence,
+                    'description' => $request->description,
+                ]);
+        
+                return response()->json(['message' => 'Nouvelle compétence créée', 'competence' => $competence], 201);
+            }
         } catch (\Exception $e) {
             // Gérer l'exception et retourner un message d'erreur
-            return response()->json(['error' => 'Erreur lors de la création de la nouvelle competence', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Erreur lors de la création de la nouvelle compétence', 'details' => $e->getMessage()], 500);
         }
+        
     }
 
     /**
@@ -95,12 +117,16 @@ class CompetenceController extends Controller
      */
     public function destroy(Competence $competence)
     {
+        
         try {
-            // Supprimer la compétence
-            $competence->delete();
-            return response()->json(['message' => 'Compétence supprimée avec succès'], 200);
+            // Ajouter 1 à la colonne deletecompetence
+            $competence->deletecompetence += 1;
+            $competence->save();
+        
+            return response()->json(['message' => 'Compétence marquée comme supprimée avec succès'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la suppression de la compétence', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Erreur lors de la mise à jour de la compétence', 'details' => $e->getMessage()], 500);
         }
+        
     }    
 }

@@ -11,6 +11,6 @@ return [
    'langpro' =>'Programming Language',
    'historique' =>'History',
    'inscription' =>'Register',
-   
+   'adtypeproject'=>'Add Type Project'
 ];
 ?>

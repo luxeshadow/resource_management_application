@@ -27,7 +27,7 @@
 
 <!-- Modal de Modification de Profil -->
 <div id="editUserModal" class="modal">
-    <div style="margin-top: 30px;" class="sign-up-form form container col-xl-6">
+    <div style="margin-top: 30px; margin-bottom: 50px;" class="sign-up-form form container col-xl-6">
         <span class="close">&times;</span>
         <form id="editUserForm">
             @csrf
@@ -44,12 +44,13 @@
                 <div style="color: red;" class="error-message"></div>
             </label>
             <label class="form-label-wrapper">
-                <p class="form-label">Email</p>
+                <p class="form-label">Telephone</p>
                 <input name="telephone" id="edit-telephone" class="form-input" type="text" placeholder="Entrez votre telephone">
                 <div style="color: red;" class="error-message"></div>
             </label>
+          
             <label class="form-label-wrapper">
-                <p class="form-label">Add profile picture</p>
+                <p class="form-label">profile</p>
             </label>
             <div class="custom__image-container">
                 <label id="add-img-label" for="add-single-img">
@@ -81,19 +82,22 @@
 </script>
 <!-- Script JavaScript pour la gestion du modal et de la modification -->
 <script>
+
 $(document).ready(function() {
-    // Chargement des données utilisateur lors du clic sur le bouton de modification
     $('.edit-profile-button').click(function() {
         var userId = $(this).data('id');
+        console.log('User ID:', userId);
         $.ajax({
             url: '/users/' + userId + '/edit',
             type: 'GET',
             success: function(user) {
+                console.log('Détails de l\'utilisateur:', user);
                 $('#edit-user-id').val(user.id);
                 $('#edit-name').val(user.name);
                 $('#edit-email').val(user.email);
                 $('#edit-telephone').val(user.telephone);
-                // Pré-remplir d'autres champs si nécessaire
+               
+                $('#edit-password').val(user.password); 
                 $('#editUserModal').css('display', 'block');
             },
             error: function(xhr, status, error) {
@@ -102,17 +106,24 @@ $(document).ready(function() {
         });
     });
 
-    // Soumission du formulaire de modification
     $('#editUserForm').submit(function(event) {
         event.preventDefault();
-        var formData = $(this).serialize();
+        var formData = new FormData(this);
         var userId = $('#edit-user-id').val();
+        console.log('Formulaire soumis. User ID:', userId);
+        console.log('FormData:', formData);
+        
         $.ajax({
             url: '/users/' + userId,
-            type: 'PUT',
+            type: 'POST',
             data: formData,
+            contentType: false,
+            processData: false,
+            headers: {
+                'X-HTTP-Method-Override': 'PUT'
+            },
             success: function(response) {
-                // Afficher un message de succès
+                console.log('Réponse du serveur:', response);
                 Swal.fire({
                     position: "center",
                     icon: "success",
@@ -121,10 +132,10 @@ $(document).ready(function() {
                     timer: 1000
                 });
                 $('#editUserModal').css('display', 'none');
-                // Recharger la page ou effectuer d'autres actions après la modification réussie
+                location.reload();
             },
             error: function(xhr, status, error) {
-                // Gérer les erreurs de validation et afficher un message d'erreur si nécessaire
+                console.log('Erreur lors de la soumission du formulaire:', error);
                 var errors = xhr.responseJSON.errors;
                 if (errors) {
                     Object.keys(errors).forEach(function(key) {
@@ -141,11 +152,14 @@ $(document).ready(function() {
         });
     });
 
-    // Fermeture du modal lors du clic sur le bouton de fermeture
     $('.close').click(function() {
         $(this).closest('.modal').css('display', 'none');
     });
 });
+
+
+
+
 </script>
 
 

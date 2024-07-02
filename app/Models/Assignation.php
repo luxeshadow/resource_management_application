@@ -14,7 +14,7 @@ class Assignation extends Model
     protected $fillable = [
         'projet_id',
         'employe_id',
-        'date_fin',
+      
            
     ];
     public function projet()
@@ -26,5 +26,8 @@ class Assignation extends Model
     {
         return $this->belongsTo(Employee::class);
     }
+    
+     
+    }
 
-}
+

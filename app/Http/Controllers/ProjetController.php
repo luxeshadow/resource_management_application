@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Projet;
 use App\Http\Requests\StoreProjetRequest;
 use App\Http\Requests\UpdateProjetRequest;
+use Illuminate\Support\Facades\Log;
 
 class ProjetController extends Controller
 {
@@ -13,8 +14,17 @@ class ProjetController extends Controller
      */
     public function index()
     {
-        $projets = Projet::orderBy('created_at', 'desc')->get();
-        return response()->json(['data' => $projets]);
+        try {
+            $projets = Projet::with('typeprojet')
+                            ->whereNull('deletprojet')
+                            ->orderByDesc('created_at')
+                            ->get();
+    
+            return response()->json(['data' => $projets]);
+        } catch (\Exception $e) {
+            Log::error('Erreur lors du chargement des projets: ' . $e->getMessage());
+            return response()->json(['error' => 'Erreur interne du serveur lors du chargement des projets.'], 500);
+        }
     }
 
     /**
@@ -80,6 +90,22 @@ class ProjetController extends Controller
     public function destroy(Projet $projet)
     {
         //
+        try {
+            if (is_null($projet->status)) {
+                // Supprimer le projet si le statut est nul
+                $projet->delete();
+                return response()->json(['message' => 'Projet supprimé avec succès'], 200);
+            } elseif ($projet->status === 'En cours' || $projet->status === 'Terminé') {
+                // Mettre à jour la colonne deletprojet à 1 si le statut est 'en cours' ou 'termine'
+                $projet->deletprojet = 1;
+                $projet->save();
+                return response()->json(['message' => 'Projet marqué comme supprimé avec succès'], 200);
+            } else {
+                return response()->json(['error' => 'Statut du projet non pris en charge'], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erreur lors de la mise à jour du projet', 'details' => $e->getMessage()], 500);
+        }
     }
 
     public function getProjetsEnCoursOuNuls() {

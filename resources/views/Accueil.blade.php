@@ -29,7 +29,7 @@
             /* Adjust position as needed */
             right: -10px;
             /* Adjust position as needed */
-            background: rgb(252, 98, 98); 
+            background: rgb(252, 98, 98);
             color: white;
             border-radius: 50%;
             padding: 2px 5px;
@@ -45,11 +45,11 @@
             /* Adjust size as needed */
         }
     </style>
-  
 
-   
-     
- 
+
+
+
+
     <main id="page-center" class="main users chart-page" id="skip-target">
         <div class="container">
             <div style="display: flex">
@@ -58,23 +58,24 @@
 
                 </h2>
 
-                <a  href="{{ route('Equipe&Projet') }}" class="notification-container" id="notificationContainer">
-                    <div title="Nombre de projet a rendre aujourd'hui" class="notification-count" id="notificationCount"></div>
-                   
+                <a href="{{ route('Equipe&Projet') }}" class="notification-container" id="notificationContainer">
+                    <div title="Nombre de projet a rendre aujourd'hui" class="notification-count" id="notificationCount">
+                    </div>
+
                 </a>
-            
+
                 <script>
                     $(document).ready(function() {
                         $.ajax({
                             url: '/notification',
                             method: 'GET',
                             success: function(data) {
-                               alert(26262);
+                                console.log(data);
                                 if (data.count > 0) {
                                     $('#notificationCount').text(data.count);
-                                
+
                                     $('#notificationContainer').show();
-                                  
+
                                 } else {
                                     $('#notificationContainer').hide();
                                 }
@@ -82,7 +83,7 @@
                         });
                     });
                 </script>
-               
+
             </div>
 
 
@@ -91,7 +92,7 @@
                 <div class="col-md-6 col-xl-3">
                     <article class="stat-cards-item">
                         <div class="stat-cards-icon purple">
-                            <img width="300px" src="{{ asset('img/launch.png') }}" alt="">
+                            <img width="300px" src="{{ asset('img/idea.png') }}" alt="">
                         </div>
                         <div class="stat-cards-info">
                             <p class="stat-cards-info__num">{{ $totalProjets }}</p>
@@ -113,9 +114,9 @@
                         </div>
                     </article>
                 </div>
-                <div class="col-md-6 col-xl-3">
+                <div class="col-md-6 col-xl-4">
 
-                    <canvas id="secteurChart" width="300" height="300"
+                    <canvas id="secteurChart" width="400" height="300"
                         style="max-width: 500px; max-height: 700px; margin: px"></canvas>
                 </div>
             </div>
@@ -123,10 +124,12 @@
             <div class="row">
                 <div class="col-lg-11">
                     <div class="chart">
-                        <canvas id="competenceChart" width="200" height="200"></canvas>
+                        <canvas id="competenceChart" width="500" height="300"></canvas>
 
                     </div>
-                    <h2 class="main-title">Rapport Statistique</h2>
+
+                    <h2 id="main-title" class="main-title">Rapport Statistique</h2>
+
 
                     <div class="chart">
                         <canvas id="projectComparisonChart" width="800" height="400"></canvas>
@@ -152,17 +155,34 @@
 
                 // Définir les couleurs pour chaque compétence
                 const competenceColors = [
+                    'rgba(128, 0, 128, 1)', // Pourpre
+                    'rgba(0, 128, 128, 1)', // Sarcelle
+                    'rgba(186, 85, 211, 1)', // Orchidée moyenne
                     'rgba(255, 99, 132, 1)', // Rouge
                     'rgba(54, 162, 235, 1)', // Bleu
+                    'rgba(218, 165, 32, 1)', // Or
                     'rgba(255, 206, 86, 1)', // Jaune
                     'rgba(75, 192, 192, 1)', // Vert
                     'rgba(153, 102, 255, 1)', // Violet
                     'rgba(255, 159, 64, 1)', // Orange
                     'rgba(200, 33, 105, 1)', // Gris
                     'rgba(40, 209, 19, 1)', // Vert
+                    'rgba(255, 99, 132, 1)', // Rouge
+                    'rgba(255, 69, 0, 1)', // Rouge orange
                     'rgba(100, 10, 155, 100)', // Violet
                     'rgba(25, 15, 6, 1)', // Orange
-                    'rgba(11, 11, 10,1)' // Gris
+                    'rgba(11, 11, 10, 1)', // Gris
+                    'rgba(0, 255, 127, 1)', // Vert de printemps
+                    'rgba(255, 20, 147, 1)', // Rose profond
+                    'rgba(0, 191, 255, 1)', // Bleu ciel profond
+                    'rgba(255, 140, 0, 1)', // Orange foncé
+                    'rgba(124, 252, 0, 1)', // Vert chartreuse
+                    'rgba(32, 178, 170, 1)', // Vert pâle
+                    'rgba(30, 144, 255, 1)', // Bleu dodger
+                    'rgba(144, 238, 144, 1)', // Vert pâle
+                    'rgba(199, 21, 133, 1)' // Rose vif
+                    
+
                 ];
 
                 const competenceBorderColors = [
@@ -178,7 +198,7 @@
                 ];
 
                 new Chart(competenceCtx, {
-                    type: 'doughnut',
+                    type: 'doughnut', 
                     data: {
                         labels: competenceLabels,
                         datasets: [{
@@ -266,35 +286,35 @@
                 console.error("Les données de secteurs ne sont pas disponibles.");
             @endif
 
+            // Fonction pour générer une couleur aléatoire
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+
+            // Initialisation du graphique
             const projectComparisonCtx = document.getElementById('projectComparisonChart').getContext('2d');
+
             const projectComparisonChart = new Chart(projectComparisonCtx, {
                 type: 'line',
                 data: {
                     labels: {!! json_encode($months) !!},
-                    datasets: [{
-                            label: 'Projets Web',
-                            data: {!! json_encode($webProjectsData) !!},
-                            fill: false,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.4,
-                            borderWidth: 2
-                        },
-                        {
-                            label: 'Projets Mobile',
-                            data: {!! json_encode($mobileProjectsData) !!},
-                            fill: false,
-                            borderColor: '#FF4F00',
-                            tension: 0.4,
-                            borderWidth: 2
-                        },
-                        {
-                            label: 'Datascience projets',
-                            data: {!! json_encode($datascienceProjectsData) !!},
-                            fill: false,
-                            borderColor: '#6F00FF',
-                            tension: 0.4,
-                            borderWidth: 2
-                        }
+                    datasets: [
+                        @foreach ($projectsData as $nomTypeProjet => $data)
+                            {
+                                label: '{{ $nomTypeProjet }}',
+                                data: {!! json_encode($data) !!},
+                                fill: false,
+                                borderColor: getRandomColor(), // Utilisation d'une fonction pour obtenir une couleur aléatoire
+                                tension: 0.4,
+                                borderWidth: 2
+                                //fill: true
+                            },
+                        @endforeach
                     ]
                 },
                 options: {
@@ -312,6 +332,17 @@
                     }
                 }
             });
+
+            // Ajoutez un gestionnaire d'événements pour changer les couleurs des graphiques lorsque vous cliquez sur le titre
+            document.getElementById('main-title').addEventListener('click', function() {
+                projectComparisonChart.data.datasets.forEach(dataset => {
+                    dataset.borderColor = getRandomColor();
+                });
+                projectComparisonChart.update();
+            });
+
+
+
 
         });
     </script>

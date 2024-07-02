@@ -1,47 +1,43 @@
 @extends('KofDashboard')
-@section('addSectors')
+@section('typeProject')
     <link rel="stylesheet" href="{{ asset('css/style.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <!-- Include jQuery -->
     <script src="{{ asset('js/jquery.js') }}"></script>
 
     <section>
-        <div id="addSectorsModal" class="modal">
+        <div id="addTypeprojetModal" class="modal">
             <div style="margin-top: 40px;" class="sign-up-form form container col-xl-6">
                 <span style="font-size: 50px;font-weight:600; cursor: pointer;float: right; color: blue"
                     class="clo">&times;</span>
-                <h2 class="main-title">{{ __('messages.adsec') }}</h2>
-                <form id="addSector">
+                <h2 class="main-title">{{ __('messages.adtypeproject') }}</h2>
+                <form id="addTypeprojet">
                     @csrf
                     <label class="form-label-wrapper">
-                        <p class="form-label">Sector</p>
-                        <input style="text-transform: capitalize" name="namesector" class="form-input" placeholder="dev mobile..." autocomplete="off">
+                        <p class="form-label">Type de Projet</p>
+                        <input style="text-transform: capitalize" name="nametypeprojet" class="form-input" placeholder="Projet A..." autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <label class="form-label-wrapper">
                         <p class="form-label">Description</p>
-                        <input name="description" class="form-input" placeholder="concepteur d'application mobile" autocomplete="off">
+                        <input name="description" class="form-input" placeholder="Description du projet" autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <button type="submit"
-                        class="form-btn primary-default-btn transparent-btn col-md-8">{{ __('messages.adsec') }}</button>
+                        class="form-btn primary-default-btn transparent-btn col-md-8">{{ __('messages.adtypeproject') }}</button>
                 </form>
             </div>
         </div>
     </section>
 
-    {{-- liste --}}
-
     <main style="margin: auto; margin-top:30px" class="col-xl-11">
-        <h1 class="main-title" style="margin-top: 10px; font-size: 22px; margin:5px">{{ __('messages.adsec') }}</h1><br>
+        <h1 class="main-title" style="margin-top: 10px; font-size: 22px; margin:5px">{{ __('messages.adtypeproject') }}</h1><br>
         <div class="users-table sign-up-form form container">
             <div style="margin-right: 35px;" class="search-wrapper">
-                <input type="text" placeholder="Recherche secteur..." required>
+                <input type="text" placeholder="Recherche type de projet..." required>
             </div>
-            <div class="users-table table-wrapper" id="listeSecteur">
+            <div class="users-table table-wrapper" id="listeTypeprojet">
                 <table class="">
                     <thead class="stat-cards-info__num">
                         <tr class="users-table-info">
@@ -50,15 +46,15 @@
                             <th>Action</th>
                         </tr>
                     </thead>
-                    <tbody id="sectors-list"></tbody>
+                    <tbody id="typeprojet-list"></tbody>
                 </table>
             </div>
-            <button class="main-nav-end" id="addSectorsButton" title="Cliquez pour ajouter"
+            <button class="main-nav-end" id="addTypeprojetButton" title="Cliquez pour ajouter"
                 style="background: none;display: flex;">
                 <div style="display: flex;">
                     <img src="{{ asset('img/add.png') }}" alt="" style="width:32px; height:32px;">
                     <p class="stat-cards-info__num" style="margin: 5px;font-weight: 500;font-size: 20px">
-                        {{ __('messages.adsec') }}
+                        {{ __('messages.adtypeproject') }}
                     </p>
                 </div>
             </button>
@@ -69,11 +65,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var addSectorButton = document.getElementById('addSectorsButton');
-            var modal = document.getElementById('addSectorsModal');
+            var addMemberButton = document.getElementById('addTypeprojetButton');
+            var modal = document.getElementById('addTypeprojetModal');
             var closeBtn = document.getElementsByClassName('clo')[0];
 
-            addSectorButton.addEventListener('click', function() {
+            addMemberButton.addEventListener('click', function() {
                 modal.style.display = 'block';
             });
 
@@ -89,68 +85,64 @@
         });
 
         $(document).ready(function() {
-    $('#addSector').on('submit', function(event) {
-        event.preventDefault(); // Empêche la soumission par défaut du formulaire
-        console.log('Form submitted');
+            $('#addTypeprojet').on('submit', function(event) {
+                event.preventDefault(); // Empêche la soumission par défaut du formulaire
+                console.log('Form submitted');
 
-        var formData = new FormData(this);
+                var formData = new FormData(this);
 
-        $.ajax({
-            url: '{{ route('sectors.store') }}', // URL de la route définie dans Laravel
-            type: 'POST',
-            data: formData,
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                console.log('Success:', response);
-                Swal.fire({
-                    position: "center",
-                    icon: "success",
-                    title: "Secteur enregistré avec succès",
-                    showConfirmButton: false,
-                    timer: 1000
+                $.ajax({
+                    url: '{{ route('typeprojets.store') }}', // URL de la route définie dans Laravel
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        console.log('Success:', response);
+                        Swal.fire({
+                            position: "center",
+                            icon: "success",
+                            title: "Type de projet enregistré avec succès",
+                            showConfirmButton: false,
+                            timer: 1000
+                        });
+                        $('#addTypeprojet')[0].reset();
+                        loadTypeprojet(); // Recharger les types de projet après ajout
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error:', xhr.responseText);
+                        var errors = xhr.responseJSON.errors;
+                        if (errors) {
+                            var errorMessages = '';
+                            Object.keys(errors).forEach(function(key) {
+                                var errorMessage = errors[key][0];
+                                errorMessages += errorMessage + '<br>';
+                            });
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                html: errorMessages
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Ce type de projet existe déjà"
+                            });
+                        }
+                    }
                 });
-                $('#addSector')[0].reset();
-                loadSectors(); // Recharger les secteurs après ajout
-            },
-            error: function(xhr, status, error) {
-                console.log('Error:', xhr.responseText);
-                var errors = xhr.responseJSON.errors;
-                if (errors) {
-                    var errorMessages = '';
-                    // Accumuler tous les messages d'erreur
-                    Object.keys(errors).forEach(function(key) {
-                        var errorMessage = errors[key][0]; // Prendre le premier message d'erreur
-                        errorMessages += errorMessage + '<br>';
-                    });
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        html: errorMessages // Utiliser HTML pour afficher plusieurs lignes
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Le Secteur existe deja"
-                    });
-                }
-            }
-        });
-    });
-
-
+            });
 
             $('.form-input').on('input', function() {
                 $(this).siblings('.error-message').html('');
             });
 
-            // Supprimer secteur
             $(document).on('click', '.btn-del', function() {
-                var sectorId = $(this).data('id');
+                var typeprojetId = $(this).data('id');
                 Swal.fire({
                     title: 'Êtes-vous sûr?',
                     text: 'Vous ne pourrez pas revenir en arrière!',
@@ -162,7 +154,7 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: '{{ route('sectors.destroy', '') }}/' + sectorId,
+                            url: '{{ route('typeprojets.destroy', '') }}/' + typeprojetId,
                             type: 'DELETE',
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -172,19 +164,18 @@
                                 Swal.fire({
                                     position: "center",
                                     icon: "success",
-                                    title: "Secteur supprimé avec succès",
+                                    title: "Type de projet supprimé avec succès",
                                     showConfirmButton: false,
                                     timer: 1000
                                 });
-                                // Recharger la liste des secteurs après la suppression
-                                loadSectors();
+                                loadTypeprojet();
                             },
                             error: function(xhr, status, error) {
                                 console.log('Error:', xhr.responseText);
                                 Swal.fire({
                                     icon: "error",
                                     title: "Oops...",
-                                    text: "Une erreur est survenue lors de la suppression du secteur"
+                                    text: "Une erreur est survenue lors de la suppression du type de projet"
                                 });
                             }
                         });
@@ -192,49 +183,43 @@
                 });
             });
 
-            loadSectors();
+            loadTypeprojet();
 
-            // Afficher les secteurs
-
-            let allSectors = [];
+            let allTypeprojet = [];
             let currentPage = 1;
-            const itemsPerPage = 5;
+            const itemsPerPage = 4;
 
-            function loadSectors() {
+            function loadTypeprojet() {
                 $.ajax({
-                    url: '/listesector',
+                    url: '/listetypeprojet',
                     type: 'GET',
                     success: function(response) {
-                        allSectors = response.data || []; // Assurez-vous que response.data est défini
-                        displaySectors(allSectors.slice(0, itemsPerPage));
-                        setupPagination(allSectors.length);
+                        allTypeprojet = response.data;
+                        displayTypeprojet(allTypeprojet.slice(0, itemsPerPage));
+                        setupPagination(allTypeprojet.length);
                     },
                     error: function(xhr, status, error) {
-                        console.log('Erreur lors du chargement des secteurs:', error);
+                        console.log('Erreur lors du chargement des types de projet:', error);
                     }
                 });
             }
 
-            function displaySectors(sectors) {
-                var sectorsList = $('#sectors-list');
-                sectorsList.empty();
+            function displayTypeprojet(typeprojet) {
+                var typeprojetList = $('#typeprojet-list');
+                typeprojetList.empty();
 
-                sectors.forEach(function(sector) {
-                    var sectorRow = `
+                typeprojet.forEach(function(typeprojet) {
+                    var typeprojetRow = `
                         <tr>
+                            <td>${typeprojet.nametypeprojet}</td>
+                            <td>${typeprojet.description}</td>
                             <td>
-                                ${sector.namesector}
-                            </td>
-                            <td>${sector.description}</td>
-                            <td>
-                                <button title="Supprimer" class="btn-del" data-id="${sector.id}">
-                                    <img src="{{ asset('img/eye.png') }}" alt="" style="width:19px; height:19px;">
-                                </button>
+                                <button title="Supprimer" class="btn-del" data-id="${typeprojet.id}"><img src="{{ asset('img/eye.png') }}" alt="" style="width:19px; height:19px;"></button>
                                 <span class="sr-only">Supprimer</span>
                             </td>
                         </tr>
                     `;
-                    sectorsList.append(sectorRow);
+                    typeprojetList.append(typeprojetRow);
                 });
             }
 
@@ -243,15 +228,18 @@
                 paginationWrapper.empty();
                 var totalPages = Math.ceil(totalItems / itemsPerPage);
 
-                var prevButton = `<button class="page-link" id="prev-page" ${currentPage === 1 ? 'disabled' : ''}>Previous...</button>`;
+                var prevButton =
+                    `<button class="page-link" id="prev-page" ${currentPage === 1 ? 'disabled' : ''}>Previous...</button>`;
                 paginationWrapper.append(prevButton);
 
                 for (let i = 1; i <= totalPages; i++) {
-                    var pageButton = `<button class="page-link ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+                    var pageButton =
+                        `<button class="page-link ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
                     paginationWrapper.append(pageButton);
                 }
 
-                var nextButton = `<button class="page-link" id="next-page" ${currentPage === totalPages ? 'disabled' : ''}>Next...</button>`;
+                var nextButton =
+                    `<button class="page-link" id="next-page" ${currentPage === totalPages ? 'disabled' : ''}>Next...</button>`;
                 paginationWrapper.append(nextButton);
             }
 
@@ -261,8 +249,8 @@
                     currentPage = page;
                     var startIndex = (currentPage - 1) * itemsPerPage;
                     var endIndex = startIndex + itemsPerPage;
-                    displaySectors(allSectors.slice(startIndex, endIndex));
-                    setupPagination(allSectors.length);
+                    displayTypeprojet(allTypeprojet.slice(startIndex, endIndex));
+                    setupPagination(allTypeprojet.length);
                 }
             });
 
@@ -271,29 +259,31 @@
                     currentPage--;
                     var startIndex = (currentPage - 1) * itemsPerPage;
                     var endIndex = startIndex + itemsPerPage;
-                    displaySectors(allSectors.slice(startIndex, endIndex));
-                    setupPagination(allSectors.length);
+                    displayTypeprojet(allTypeprojet.slice(startIndex, endIndex));
+                    setupPagination(allTypeprojet.length);
                 }
             });
 
             $(document).on('click', '#next-page', function() {
+                var totalPages = Math.ceil(allTypeprojet.length / itemsPerPage);
                 if (currentPage < totalPages) {
                     currentPage++;
                     var startIndex = (currentPage - 1) * itemsPerPage;
                     var endIndex = startIndex + itemsPerPage;
-                    displaySectors(allSectors.slice(startIndex, endIndex));
-                    setupPagination(allSectors.length);
+                    displayTypeprojet(allTypeprojet.slice(startIndex, endIndex));
+                    setupPagination(allTypeprojet.length);
                 }
             });
 
             $('.search-wrapper input').on('input', function() {
                 var searchTerm = $(this).val().toLowerCase();
-                var filteredSectors = allSectors.filter(function(sector) {
-                    return sector.namesector.toLowerCase().includes(searchTerm);
+                var filteredTypeprojet = allTypeprojet.filter(function(typeprojet) {
+                    return typeprojet.nametypeprojet.toLowerCase().includes(searchTerm) ||
+                        typeprojet.description.toLowerCase().includes(searchTerm);
                 });
-                currentPage = 1; // Réinitialiser à la première page
-                displaySectors(filteredSectors.slice(0, itemsPerPage));
-                setupPagination(filteredSectors.length);
+                currentPage = 1;
+                displayTypeprojet(filteredTypeprojet.slice(0, itemsPerPage));
+                setupPagination(filteredTypeprojet.length);
             });
         });
     </script>

@@ -26,7 +26,7 @@ class StoreSectorRequest extends FormRequest
     {
         return [
             //
-            'namesector' => 'required|string|max:255|unique:sectors,namesector',
+            'namesector' => 'required|string|max:255|min:5|unique:sectors,namesector',
             'description' => 'required|string|max:255',
         ];
     }
@@ -40,6 +40,8 @@ class StoreSectorRequest extends FormRequest
     {
         return [
             'namesector.unique' => 'Cet secteure existe deja',
+            'namesector.min' => 'Le champ dois contenire plus de 3 lettre.',
+            'namesector.required' => 'Le  secteur est obligatoire.',
             'description' => 'Description obligatoire',
            
         ];

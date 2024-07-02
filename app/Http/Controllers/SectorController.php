@@ -25,18 +25,21 @@ class SectorController extends Controller
      
      
     }
-
     public function listesector()
     {
         try {
-            // Récupérer toutes les secteurs
-            $sectors = Sector::all();
+            // Récupérer toutes les compétences
+            $sectors = Sector::select('id', 'namesector','description')
+            ->whereNull('deletesector')
+            ->get();
     
             return response()->json(['data' => $sectors], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la récupération des secteurs', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Erreur lors de la récupération des sector', 'details' => $e->getMessage()], 500);
         }
     }
+
+   
 
     /**
      * Show the form for creating a new resource.
@@ -52,20 +55,37 @@ class SectorController extends Controller
      * Store a newly created resource in storage.
      */
     public function store(StoreSectorRequest $request)
-    {
-        try {
+{
+    try {
+        // Vérifier si le secteur existe déjà
+        $existingSector = Sector::where('namesector', $request->namesector)->first();
+
+        if ($existingSector) {
+            // Vérifier si la colonne deletecompetence est null
+            if ($existingSector->deletecompetence !== null) {
+                // Ajouter 1 à la colonne deletecompetence
+                $existingSector->deletecompetence += 1;
+                $existingSector->save();
+                return response()->json(['message' => 'Secteur existant mis à jour avec succès'], 200);
+            } else {
+                // La compétence existe déjà avec deletecompetence null
+                return response()->json(['error' => 'Le secteur existe déjà'], 409);
+            }
+        } else {
             // Créer un nouveau secteur
             $secteur = Sector::create([
                 'namesector' => $request->namesector,
                 'description' => $request->description,
             ]);
-    
+
             return response()->json(['message' => 'Nouveau secteur créé avec succès', 'sector' => $secteur], 201);
-        } catch (\Exception $e) {
-            // Gérer l'exception et retourner un message d'erreur
-            return response()->json(['error' => 'Erreur lors de la création du nouveau secteur', 'details' => $e->getMessage()], 500);
         }
+    } catch (\Exception $e) {
+        // Gérer l'exception et retourner un message d'erreur
+        return response()->json(['error' => 'Erreur lors de la création du nouveau secteur', 'details' => $e->getMessage()], 500);
     }
+}
+
     
 
     /**
@@ -98,12 +118,15 @@ class SectorController extends Controller
     public function destroy(Sector $sector)
     {
         //
+      
         try {
-            // Supprimer le secteur
-            $sector->delete();
-            return response()->json(['message' => 'Secteur supprimé avec succès'], 200);
+            // Ajouter 1 à la colonne deletecompetence
+            $sector->deletesector += 1;
+            $sector->save();
+        
+            return response()->json(['message' => 'Secteur marquée comme supprimée avec succès'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Erreur lors de la suppression du secteur', 'details' => $e->getMessage()], 500);
+            return response()->json(['error' => 'Erreur lors de la mise à jour de la Secteur', 'details' => $e->getMessage()], 500);
         }
     }
 }

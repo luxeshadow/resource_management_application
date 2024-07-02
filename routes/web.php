@@ -4,12 +4,14 @@ use App\Http\Controllers\AssignationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProjetController;
+use App\Http\Controllers\TypeprojetController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SectorController;
 use App\Http\Controllers\CompetenceController;
 use App\Http\Controllers\UserController;
+use App\Models\Typeprojet;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,6 +59,7 @@ Route::middleware('auth','nocache')->group(function () {
     Route::get('/projets/en-cours-ou-nuls', [ProjetController::class, 'getProjetsEnCoursOuNuls']);
     Route::get('employees/disponibilite/null', [EmployeeController::class, 'getEmployeesWithNullDisponibilite']);
     Route::get('/listecompetence', [CompetenceController::class, 'listecompetence']);
+    Route::get('/listetypeprojet', [TypeprojetController::class, 'listetypeprojet']);
     Route::get('/listesector', [SectorController::class, 'listesector']);
     Route::get('/notification', [AssignationController::class, 'getAssignmentsDueToday'])->name('notification');
     // Ressource
@@ -67,8 +70,11 @@ Route::middleware('auth','nocache')->group(function () {
     
     Route::resource('sectors', SectorController::class);
     Route::resource('competences', CompetenceController::class);
+    Route::resource('typeprojets', TypeprojetController::class);
     Route::resource('users', UserController::class);
 });
+
+
 
 /*
 The Previous Delete Code is here

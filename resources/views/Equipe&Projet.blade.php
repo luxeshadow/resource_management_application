@@ -22,42 +22,38 @@
 
 
     @php
-        $nombreProjetsTermines = 0;
+        $tousProjetsTermines = true;
+        foreach ($projets as $projet) {
+            if ($projet->status != 'Terminé') {
+                $tousProjetsTermines = false;
+                break;
+            }
+        }
     @endphp
 
-    @foreach ($projets as $projet)
-        @if ($projet->status == 'Terminé')
-            @php
-                $nombreProjetsTermines++;
-            @endphp
-        @endif
-    @endforeach
-
-    @if ($nombreProjetsTermines == count($projets))
-        <div class="" style="text-align: center;font-weight: 600;cursor: pointer;margin-top:100px">
+    @if ($tousProjetsTermines)
+        <div class="" style="text-align: center; font-weight: 600; cursor: pointer; margin-top: 100px">
             <img src="{{ asset('img/fold.png') }}" alt=""
-                style="width:200px; height:200px; justify-content: center';">
-            <p class="stat-cards-info__num">Aucun projet en cours........</p>
+                style="width: 200px; height: 200px; justify-content: center">
+            <p class="stat-cards-info__num">Aucun projet en cours...</p>
         </div>
     @else
         @foreach ($projets as $projet)
-            @if ($projet->assignations->isNotEmpty())
+            @if ($projet->status == 'En cours' && $projet->assignations->isNotEmpty())
                 <main class="stat-cards-item" style="margin: 20px">
                     <input id="selectProjet" type="hidden" value="{{ $projet->id }}">
-                    <article style="margin-bottom: 20px" class="row">
-                        <div class="col-xl-3" style="text-align: center;margin-top: 50px">
-                            <div title="Nom du projet" class="stat-cards-info__num"
-                                style="margin-left: 110px;margin-bottom: 30px;margin-top: 20px;font-weight: 600;text-align: center;">
-                                <div class="circle"></div>
-                                <div class="overflow-text"> {{ $projet->nomprojet }}</div>
+                    <input id="modalProjectId" type="hidden" value="">
 
+                    <article style="margin-bottom: 20px" class="row">
+                        <div class="col-xl-3" style="text-align: center; margin-top: 50px">
+                            <div title="Nom du projet" class="stat-cards-info__num"
+                                style="margin-left: 110px; margin-bottom: 30px; margin-top: 20px; font-weight: 600; text-align: center;">
+                                <div class="circle"></div>
+                                <div class="overflow-text">{{ $projet->nomprojet }}</div>
                             </div>
 
-                            <br>
-                            <br>
-                            <p class="stat-cards-info__num">
-                                Date Debut {{ $projet->created_at }}
-                            </p>
+                            <br><br>
+                            <p class="stat-cards-info__num">Date Début {{ $projet->created_at }}</p>
                             <style>
                                 .expired {
                                     color: #f26464;
@@ -65,76 +61,69 @@
                                 }
                             </style>
                             <p class="stat-cards-info__num">
-                                <span id="date-fin">Date Fin {{ $projet->assignations->first()->date_fin }}</span>
+                                <span class="date-fin">Date Fin {{ $projet->date_fin }}</span>
                             </p>
                             <script>
                                 document.addEventListener('DOMContentLoaded', function() {
-                                    // Récupérer la date de fin depuis l'élément HTML
-                                    const dateFinElement = document.getElementById('date-fin');
-                                    const dateFinText = dateFinElement.textContent.trim();
+                                    const dateElements = document.querySelectorAll('.date-fin');
 
-                                    // Convertir la date de fin en objet Date
-                                    const dateFin = new Date(dateFinText);
+                                    dateElements.forEach(function(dateElement) {
+                                        const dateFinText = dateElement.textContent.trim();
+                                        const dateFin = new Date(dateFinText);
+                                        const today = new Date();
 
-                                    // Obtenir la date actuelle
-                                    const today = new Date();
-
-                                    // Comparer les dates
-                                    if (dateFin < today) {
-                                        // Appliquer le style CSS si la date de fin est inférieure à la date actuelle
-                                        dateFinElement.classList.add('expired');
-                                    }
+                                        if (dateFin < today) {
+                                            dateElement.classList.add('expired');
+                                        }
+                                    });
                                 });
                             </script>
+
                             <i style="color: rgba(246, 206, 3, 0.78);" class="stat-cards-info__num">
                                 {{ $projet->status }}...
                             </i>
                         </div>
-                        <span style="border:2px solid; padding-top: 100px; margin-left: 50px;"
+                        <span style="border: 2px solid; padding-top: 100px; margin-left: 50px;"
                             class="stat-cards-info__num"></span>
 
                         <div class="users-table sign-up-form form container col-xl-8">
-
-
                             <div class="main-nav-start">
                                 <div class="search-wrapper">
-
                                     <button id="addMemberButton" title="Cliquez pour ajouter un membre"
-                                        style="background: none;display: flex;">
+                                        data-target="#addMemberModal" data-project-id="{{ $projet->id }}"
+                                        style="background: none; display: flex;">
                                         <img src="{{ asset('img/add.png') }}" alt=""
-                                            style="width:32px; height:32px;">
+                                            style="width: 32px; height: 32px;">
                                         <p class="stat-cards-info__num"
-                                            style="margin: 5px;font-weight: 500;font-size: 20px">
-
-                                            Ajouter un membre
-                                        </p>
+                                            style="margin: 5px; font-weight: 500; font-size: 20px">Ajouter un membre</p>
                                     </button>
 
-
-                                    {{-- MODAL --}}
-
+                                    {{-- <button id="addMemberButton" title="Cliquez pour ajouter un membre"
+                                data-target="#addMemberModal" style="background: none; display: flex;">
+                                <img src="{{ asset('img/add.png') }}" alt="" style="width: 32px; height: 32px;">
+                                <p class="stat-cards-info__num" style="margin: 5px; font-weight: 500; font-size: 20px">Ajouter un membre</p>
+                            </button> --}}
 
                                     {{-- MODAL --}}
                                 </div>
                             </div>
                             <div class="users-table table-wrapper">
-                                <table class="">
+                                <table>
                                     <thead class="stat-cards-info__num">
                                         <tr class="users-table-info">
                                             <th>Nom</th>
-                                            <th>Telephone</th>
-                                            <th>Secteur d'Activite</th>
-                                            <th>Competences</th>
+                                            <th>Téléphone</th>
+                                            <th>Secteur d'Activité</th>
+                                            <th>Compétences</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($employees as $employee)
-                                            @foreach ($employee->assignations as $assignation)
-                                                @if ($assignation->projet->status == 'En cours')
+                                        @foreach ($projet->assignations as $assignation)
+                                            @foreach ($employees as $employee)
+                                                @if ($employee->id == $assignation->employe_id)
                                                     <tr>
                                                         <td>{{ $employee->nom }}</td>
-                                                        <td>{{ $employee->email }}</td>
                                                         <td>{{ $employee->telephone }}</td>
                                                         <td>
                                                             @foreach ($employee->tasks as $task)
@@ -150,55 +139,45 @@
                                                                 @endif
                                                             @endforeach
                                                         </td>
-                                                        <td>{{ $assignation->projet->nom }}</td>
+
                                                         <td>
                                                             <button title="Cliquez pour retirer un membre" class="btn-del"
                                                                 data-id="{{ $assignation->id }}">
                                                                 <img src="{{ asset('img/eye.png') }}" alt=""
-                                                                    style="width:22px; height:20px;">
+                                                                    style="width: 22px; height: 20px;">
                                                             </button>
                                                         </td>
                                                     </tr>
                                                 @endif
                                             @endforeach
                                         @endforeach
-
                                     </tbody>
                                 </table>
                             </div>
                             <div style="display: flex">
                                 <button class="archive-btn" title="Cliquez pour archiver tous"
-                                    data-id="{{ $projet->id }}" style="background: none;display: flex;">
-                                    <img src="{{ asset('img/flo.png') }}" alt="" style="width:32px; height:32px;">
-                                    <p class="stat-cards-info__num" style="margin: 5px;font-weight: 500;font-size: 20px">
-                                        Archiver
-                                    </p>
+                                    data-id="{{ $projet->id }}" style="background: none; display: flex;">
+                                    <img src="{{ asset('img/flo.png') }}" alt=""
+                                        style="width: 32px; height: 32px;">
+                                    <p class="stat-cards-info__num" style="margin: 5px; font-weight: 500; font-size: 20px">
+                                        Archiver</p>
                                 </button>
-                                <button title="Cliquez pour suprimer tous"
-                                    style="background: none;display: flex;margin-left: 30px">
+                                <button title="Cliquez pour supprimer tous"
+                                    style="background: none; display: flex; margin-left: 30px">
                                     <img src="{{ asset('img/delete.png') }}" alt=""
-                                        style="width:32px; height:32px;">
-                                    <p class="stat-cards-info__num" style="margin: 5px;font-weight: 500;font-size: 20px">
-                                        Suprimer tous
-                                    </p>
+                                        style="width: 32px; height: 32px;">
+                                    <p class="stat-cards-info__num" style="margin: 5px; font-weight: 500; font-size: 20px">
+                                        Supprimer tous</p>
                                 </button>
                             </div>
-                            <span>
-                                {{-- <form action="{{ route('modifierEquipe') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="projet_id" value="{{ $projet->id }}">
-                                    @foreach ($projet->assignations as $assignation)
-                                        <input type="hidden" name="employe_ids[]" value="{{ $assignation->employe->id }}">
-                                    @endforeach
-                                    <button type="submit" class="bo-m">Modifier Equipe</button>
-                                </form> --}}
-                            </span>
+                            <span></span>
                         </div>
                     </article>
                 </main>
             @endif
         @endforeach
     @endif
+
     <br>
     </div>
 
@@ -265,7 +244,7 @@
                         success: function(response) {
                             allEmployees = response; // Stocker tous les employés
                             displayEmployees(allEmployees,
-                            page); // Afficher les employés pour la page actuelle
+                                page); // Afficher les employés pour la page actuelle
                             displayPagination(allEmployees.length); // Afficher les liens de pagination
                         },
                         error: function(xhr, status, error) {
@@ -301,6 +280,7 @@
                     <td>${employee.email}</td>
                     <td>${secteurs}</td>
                     <td>${competences}</td>
+                    
                 </tr>
             `);
                     });
@@ -353,6 +333,55 @@
                         currentPage = page;
                         displayEmployees(allEmployees, page);
                     });
+
+                    // Gestionnaire d'événements pour la suppression des affectations
+                    $(document).on('click', '.btn-del', function() {
+                        const button = this;
+                        const assignationId = $(this).data('id');
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!',
+                            cancelButtonText: 'Cancel'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                $.ajax({
+                                    url: '{{ route('assignations.destroy', '') }}/' +
+                                        assignationId,
+                                    type: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrfToken
+                                    },
+                                    success: function(response) {
+                                        if (response.success) {
+                                            Swal.fire('Deleted!',
+                                                'The assignment has been deleted.',
+                                                'success');
+                                            var row = $(button).closest('tr');
+                                            row.remove();
+                                            loadEmployees(
+                                                currentPage
+                                            ); // Recharge les employés après la suppression réussie
+                                        } else {
+                                            Swal.fire('Error!',
+                                                'An error occurred while deleting.',
+                                                'error');
+                                        }
+                                    },
+                                    error: function() {
+                                        Swal.fire('Error!',
+                                            'An error occurred while deleting.', 'error'
+                                        );
+                                    }
+                                });
+                            }
+                        });
+                    });
                 }
 
                 // Ajouter un gestionnaire d'événements pour la recherche avec debounce pour améliorer les performances
@@ -374,21 +403,72 @@
                     displayPagination(filteredEmployees.length); // Mettre à jour la pagination
                 }, 300));
 
+                // $('#addnew').on('click', function() {
+                //     console.log("Bouton 'Ajouter' cliqué"); // Ajoutez cette ligne pour déboguer
+                //     const projetId = $('#selectProjet').val();
+                //     alert(projetId);
+                //     const employeeIds = Array.from(selectedEmployeeIds);
+
+                //     console.log("Projet ID:", projetId); // Ajoutez cette ligne pour déboguer
+                //     console.log("IDs des employés sélectionnés:",
+                //         employeeIds); // Ajoutez cette ligne pour déboguer
+
+                //     $.ajax({
+                //         url: '{{ route('addmember') }}',
+                //         method: 'POST',
+                //         headers: {
+                //             'X-CSRF-TOKEN': csrfToken
+                //         },
+                //         data: {
+                //             projet_id: projetId,
+                //             employe_id: employeeIds,
+                //         },
+                //         success: function(response) {
+                //             const Toast = Swal.mixin({
+                //                 toast: true,
+                //                 position: "top-center",
+                //                 showConfirmButton: false,
+                //                 timer: 1000,
+                //                 timerProgressBar: true,
+                //                 didOpen: (toast) => {
+                //                     toast.onmouseenter = Swal.stopTimer;
+                //                     toast.onmouseleave = Swal.resumeTimer;
+                //                 }
+                //             });
+                //             Toast.fire({
+                //                 icon: "success",
+                //                 title: "Membres ajoutés avec succès"
+                //             });
+                //             $('#selectProjet').val('');
+                //             $('input[name="date"]').val('');
+                //             selectedEmployeeIds.clear();
+                //             loadEmployees(
+                //                 currentPage); // Recharger les employés après l'ajout des membres
+                //             $('#selectedEmployeesTable tbody')
+                //                 .empty(); // Vider la table des employés sélectionnés
+                //         },
+                //         error: function(xhr, status, error) {
+                //             Swal.fire({
+                //                 icon: 'error',
+                //                 title: 'Erreur!',
+                //                 text: xhr.responseJSON.message,
+                //             });
+                //         }
+                //     });
+                // });
                 $('#addnew').on('click', function() {
-                    console.log("Bouton 'Ajouter' cliqué"); // Ajoutez cette ligne pour déboguer
-                    const projetId = $('#selectProjet').val();
-                    alert(projetId);
+                    console.log("Bouton 'Ajouter' cliqué");
+                    const projetId = $('#modalProjectId')
+                .val(); // Récupère l'ID du projet depuis le champ caché
                     const employeeIds = Array.from(selectedEmployeeIds);
 
-                    console.log("Projet ID:", projetId); // Ajoutez cette ligne pour déboguer
-                    console.log("IDs des employés sélectionnés:",
-                    employeeIds); // Ajoutez cette ligne pour déboguer
+                    console.log("Projet ID:", projetId);
+                    console.log("IDs des employés sélectionnés:", employeeIds);
 
                     $.ajax({
                         url: '{{ route('addmember') }}',
                         method: 'POST',
                         headers: {
-                            // Ajoute le jeton CSRF à l'en-tête de la requête AJAX
                             'X-CSRF-TOKEN': csrfToken
                         },
                         data: {
@@ -396,29 +476,30 @@
                             employe_id: employeeIds,
                         },
                         success: function(response) {
-                            // Afficher une alerte SweetAlert de succès
                             const Toast = Swal.mixin({
-                            toast: true,
-                            position: "top-center",
-                            showConfirmButton: false,
-                            timer: 1000,
-                            timerProgressBar: true,
-                            didOpen: (toast) => {
-                                toast.onmouseenter = Swal.stopTimer;
-                                toast.onmouseleave = Swal.resumeTimer;
-                            }
-                        });
-                        Toast.fire({
-                            icon: "success",
-                            title: "Signed in successfully"
-                        });
-                            $('#selectProjet').val('');
+                                toast: true,
+                                position: "top-center",
+                                showConfirmButton: false,
+                                timer: 1000,
+                                timerProgressBar: true,
+                                didOpen: (toast) => {
+                                    toast.onmouseenter = Swal.stopTimer;
+                                    toast.onmouseleave = Swal.resumeTimer;
+                                }
+                            });
+                            Toast.fire({
+                                icon: "success",
+                                title: "Membres ajoutés avec succès"
+                            });
+                            $('#modalProjectId').val(''); // Réinitialiser le champ caché
                             $('input[name="date"]').val('');
                             selectedEmployeeIds.clear();
-                            location.reload();
+                            loadEmployees(
+                            currentPage); // Recharger les employés après l'ajout des membres
+                            $('#selectedEmployeesTable tbody')
+                        .empty(); // Vider la table des employés sélectionnés
                         },
                         error: function(xhr, status, error) {
-                            // Afficher une alerte SweetAlert d'erreur
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Erreur!',
@@ -427,6 +508,7 @@
                         }
                     });
                 });
+
 
                 // Attacher les gestionnaires d'événements pour la première fois
                 attachEventHandlers();
@@ -438,87 +520,84 @@
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var addMemberButton = document.getElementById('addMemberButton');
-                var modal = document.getElementById('addMemberModal');
-                var closeBtn = document.getElementsByClassName('clo')[0];
+            //   document.addEventListener('DOMContentLoaded', function() {
+            //     var addMemberButtons = document.querySelectorAll('[data-target]');
+            //     var modals = document.querySelectorAll('.modal');
+            //     var closeButtons = document.querySelectorAll('.clo');
 
-                addMemberButton.addEventListener('click', function() {
-                    modal.style.display = 'block';
+            //     addMemberButtons.forEach(function(button) {
+            //         button.addEventListener('click', function() {
+            //             var targetModalId = this.getAttribute('data-target');
+            //             var modal = document.querySelector(targetModalId);
+            //             if (modal) {
+            //                 modal.style.display = 'block';
+            //             }
+            //         });
+            //     });
+
+            //     closeButtons.forEach(function(closeBtn) {
+            //         closeBtn.addEventListener('click', function() {
+            //             var modal = this.closest('.modal');
+            //             if (modal) {
+            //                 modal.style.display = 'none';
+            //                 location.reload(); // Rechargez la page ou effectuez d'autres actions nécessaires
+            //             }
+            //         });
+            //     });
+
+            //     window.addEventListener('click', function(event) {
+            //         modals.forEach(function(modal) {
+            //             if (event.target == modal) {
+            //                 modal.style.display = 'none';
+            //             }
+            //         });
+            //     });
+            // });
+            document.addEventListener('DOMContentLoaded', function() {
+                var addMemberButtons = document.querySelectorAll('[data-target]');
+                var modals = document.querySelectorAll('.modal');
+                var closeButtons = document.querySelectorAll('.clo');
+
+                addMemberButtons.forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var targetModalId = this.getAttribute('data-target');
+                        var projectId = this.getAttribute('data-project-id'); // Récupère l'ID du projet
+                        var modal = document.querySelector(targetModalId);
+                        if (modal) {
+                            modal.style.display = 'block';
+                            document.getElementById('modalProjectId').value =
+                            projectId; // Met à jour le champ caché
+                        }
+                    });
                 });
 
-                closeBtn.addEventListener('click', function() {
-                    modal.style.display = 'none';
+                closeButtons.forEach(function(closeBtn) {
+                    closeBtn.addEventListener('click', function() {
+                        var modal = this.closest('.modal');
+                        if (modal) {
+                            modal.style.display = 'none';
+                            location
+                        .reload(); // Rechargez la page ou effectuez d'autres actions nécessaires
+                        }
+                    });
                 });
 
                 window.addEventListener('click', function(event) {
-                    if (event.target == modal) {
-                        modal.style.display = 'none';
-                    }
+                    modals.forEach(function(modal) {
+                        if (event.target == modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
                 });
             });
         </script>
+
 
 
         {{-- ----------------------------------------Touche pas------------------------------------------------------------ --}}
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 // Ajoute un événement de clic pour chaque bouton de suppression
-                document.querySelectorAll('.btn-del').forEach(button => {
-                    button.addEventListener('click', function() {
-                        // Récupère l'ID de l'assignation à partir de l'attribut data-id
-                        let assignationId = this.getAttribute('data-id');
-
-                        // Affiche une alerte de confirmation avec SweetAlert
-                        Swal.fire({
-                            title: 'Êtes-vous sûr?',
-                            text: "Vous ne pourrez pas annuler cela!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: 'Oui, supprimez-le!',
-                            cancelButtonText: 'Annuler'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                // Si l'utilisateur confirme, envoie une requête DELETE via AJAX
-                                $.ajax({
-                                    url: '{{ route('assignations.destroy', '') }}/' +
-                                        assignationId,
-                                    type: 'DELETE',
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]')
-                                            .attr('content')
-                                    },
-                                    success: function(response) {
-                                        if (response.success) {
-                                            // Si la requête réussit, affiche une alerte de succès
-                                            Swal.fire('Supprimé!',
-                                                'L\'assignation a été supprimée.',
-                                                'success');
-
-                                            // Supprime la ligne du tableau correspondante à l'assignation supprimée
-                                            var row = $(button).closest('tr');
-                                            row.remove();
-                                        } else {
-                                            // Si la requête échoue, affiche une alerte d'erreur
-                                            Swal.fire('Erreur!',
-                                                'Une erreur s\'est produite lors de la suppression.',
-                                                'error');
-                                        }
-                                    },
-                                    error: function() {
-                                        // Si la requête échoue, affiche une alerte d'erreur
-                                        Swal.fire('Erreur!',
-                                            'Une erreur s\'est produite lors de la suppression.',
-                                            'error');
-                                    }
-                                });
-                            }
-                        });
-                    });
-                });
-
                 // Utilisation de jQuery pour la simplicité, mais vous pouvez également utiliser Axios ou fetch API
 
                 document.querySelectorAll('.archive-btn').forEach(button => {

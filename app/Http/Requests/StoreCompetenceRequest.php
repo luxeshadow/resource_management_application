@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
 class StoreCompetenceRequest extends FormRequest
 {
@@ -23,6 +26,36 @@ class StoreCompetenceRequest extends FormRequest
     {
         return [
             //
+            'namecompetence' => 'required|string|max:255',
+            'description' => 'required|string|max:255',
         ];
+    }
+
+     /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            
+            'namecompetence.required' => 'La competence est obligatoire.',
+            'description' => 'Description obligatoire',
+           
+        ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $errors = (new ValidationException($validator))->errors();
+
+        throw new HttpResponseException(
+            response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $errors
+            ], 422)
+        );
     }
 }

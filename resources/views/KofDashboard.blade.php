@@ -91,8 +91,9 @@
                             </a>
                             <ul class="cat-sub-menu">
                                 <li>
-                                    <a href="{{ route('CreateEmployer') }}">{{ __('messages.ademp') }}</a>
+                                    <a href="{{ route('CreateEmployer')}}" id="load-create-employer">{{ __('messages.ademp') }}</a>
                                 </li>
+                                
                                 <li>
                                     <a href="{{ route('CreateProjet')}}">{{ __('messages.adpro') }}</a>
                                 </li>
@@ -101,6 +102,9 @@
                                 </li>
                                 <li>
                                     <a href="{{ route('sectors.create')}}">{{ __('messages.adsec') }}</a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('typeprojets.create')}}">{{ __('messages.adtypeproject') }}</a>
                                 </li>
                                 
                             </ul>
@@ -148,7 +152,7 @@
                     
                     <ul class="sidebar-body-menu">
                         <li>
-                            <a href="##"><span class="icon setting" aria-hidden="true"></span>Settings</a>
+                            <a href="##" style="cursor: text;"><span class="icon setting" aria-hidden="true"></span>Settings</a>
                         </li>
                       
                                 <li>
@@ -171,14 +175,51 @@
                         <a href="##" class="sidebar-user">
                             <span >
                             
-                               <img style="border: rgb(211, 216, 216) 1px solid" class="sidebar-user-img" src="{{ asset('storage/' . session('user.photo')) }}" alt="User name">
+                               <img style="border: rgb(211, 216, 216) 1px solid"  class="sidebar-user-img" src="{{ asset('storage/' . session('user.photo')) }}" alt="User name">
+ 
                             </span>
                             <div class="sidebar-user-info">
-                                <span class="sidebar-user__title">{{ session('user.name') }}</span>
+                                <div style="display: flex">
+                                    <span class="sidebar-user__title">{{ session('user.name') }}</span>
+                                    <span id="notification-count"></span>
+                                </div>
+                                
                                 <span class="sidebar-user__subtitle">{{ session('user.email') }}</span>
+                              
                             </div>
                         </a>
                     </div>
+                 
+                       
+                       
+                   
+                    <style>
+       
+
+        /* secteur fin selection */
+        #notification-count {
+            
+           
+            margin-top: -5px;
+            /* Adjust position as needed */
+            
+            /* Adjust position as needed */
+            background: #0BDA51; 
+            color: white;
+            border-radius: 50%;
+            padding: 2px 5px;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 10px;
+            cursor: pointer;
+            /* Adjust size as needed */
+            height: 10px;
+            /* Adjust size as needed */
+        }
+                    </style>
                    
                 </div>
             </div>
@@ -260,7 +301,7 @@
                         </button>
                         
                         <div class="nav-user-wrapper">
-                            <button class="dropdown-btn theme-switcher gray-circle-btn" type="button" title="Switch theme">
+                            <button class="dropdown-btn theme-switcher gray-circle-btn" type="button" title="Mon profile">
                                 
                                 <span class="sr-only">My profile</span>
                                     <i data-feather="user" aria-hidden="true"></i>
@@ -314,6 +355,9 @@
             </div>
             <div>
                 @yield('addSectors')
+            </div>
+            <div>
+                @yield('typeProject')
             </div>
 
 

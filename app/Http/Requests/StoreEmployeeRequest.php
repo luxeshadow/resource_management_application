@@ -25,7 +25,7 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom' => 'required|string|max:255',
+            'nom' => 'required|string|max:255|min:5',
             'telephone' => 'required|string|regex:/^\+?[0-9\s\-]+$/|max:20',
             'email' => 'required|string|email|max:255|unique:employees,email',
             'profile' => 'required',
@@ -45,6 +45,8 @@ class StoreEmployeeRequest extends FormRequest
     {
         return [
             'nom.required' => 'Le nom est obligatoire.',
+            'nom.string' => 'Le nom dois etre du text.',
+            'nom.min' => 'Le champ dois contenire plus de 5 lettre.',
             'telephone.required' => 'Le téléphone est obligatoire.',
             'telephone.regex' => 'Le téléphone doit être un numéro valide.',
             'email.required' => 'L\'email est obligatoire.',

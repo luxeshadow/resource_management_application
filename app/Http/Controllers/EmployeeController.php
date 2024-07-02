@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Typeprojet;
 use App\Models\Assignation;
 use App\Models\Task;
 use App\Models\Specialist;
@@ -21,8 +22,9 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::with(['tasks.sector'])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        ->whereNull('deletemployee')
+        ->orderBy('created_at', 'desc')
+        ->get();
 
         // Préparez les données pour la réponse JSON
         $employeesData = $employees->map(function ($employee) {
@@ -165,13 +167,11 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
-        if(is_null($employee->disponibilite)){
-         
-                $employee->delete();
-                return response()->json(['message' => 'Employé supprimé avec succès']);
-           
-        } else{
-            return response()->json(['message' => 'l\'employé ne peut pas etre suprimer car il es assigner a un projet actuellement'], 500);
+        if (is_null($employee->disponibilite)) {
+            $employee->increment('deletemployee');
+            return response()->json(['message' => 'Le statut de suppression de l\'employé a été mis à jour avec succès']);
+        } else {
+            return response()->json(['message' => 'L\'employé ne peut pas être supprimé car il est assigné à un projet actuellement'], 500);
         }
        
     }
@@ -195,57 +195,46 @@ class EmployeeController extends Controller
             $secteurData[$secteurNom] = Task::where('sector_id', $secteurId)->count();
         }
 
-        $totalEmployees = Employee::count();
-        $totalProjets = Projet::count();
+        $totalEmployees = Employee::whereNull('deletemployee')->count();
+        $totalProjets = Projet::whereNull('deletprojet')->count();
 
-        // Nombre de projets web réalisés par mois
-        $webProjectsByMonth = Projet::where('typeprojet', 'web')
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, count(*) as total')
-            ->groupBy('month')
-            ->get()
-            ->pluck('total', 'month');
+       
+        $typesProjets = TypeProjet::all();
 
-        // Nombre de projets mobile réalisés par mois
-        $mobileProjectsByMonth = Projet::where('typeprojet', 'mobile')
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, count(*) as total')
-            ->groupBy('month')
-            ->get()
-            ->pluck('total', 'month');
-
-        // Nombre de projets datascience réalisés par mois
-        $datascienceProjectsByMonth = Projet::where('typeprojet', 'datascience')
-            ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, count(*) as total')
-            ->groupBy('month')
-            ->get()
-            ->pluck('total', 'month');
-
+        $projectsByMonth = [];
+        
+        foreach ($typesProjets as $typeProjet) {
+            $projectsByMonth[$typeProjet->nametypeprojet] = Projet::where('typeprojet', $typeProjet->id)
+                ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, count(*) as total')
+                ->groupBy('month')
+                ->get()
+                ->pluck('total', 'month');
+        }
+        
         // Création d'un tableau de mois pour l'affichage sur l'axe x du graphique
         $months = collect(range(1, 12))->map(function ($month) {
-            return Carbon::now()->startOfYear()->addMonths($month - 1)->format('Y-m');
+            return now()->startOfYear()->addMonths($month - 1)->format('Y-m');
         });
-
-        // Création des séries de données pour le graphique
-        $webProjectsData = $months->map(function ($month) use ($webProjectsByMonth) {
-            return $webProjectsByMonth->get($month, 0);
-        });
-
-        $datascienceProjectsData = $months->map(function ($month) use ($datascienceProjectsByMonth) {
-            return $datascienceProjectsByMonth->get($month, 0);
-        });
-
-        $mobileProjectsData = $months->map(function ($month) use ($mobileProjectsByMonth) {
-            return $mobileProjectsByMonth->get($month, 0);
-        });
-
         
-        return view('accueil', compact('competenceData', 'secteurData', 'totalEmployees', 'totalProjets', 'webProjectsData', 'mobileProjectsData', 'datascienceProjectsData', 'months'));
+        // Création des séries de données pour le graphique
+        $projectsData = [];
+        
+        foreach ($typesProjets as $typeProjet) {
+            $projectsData[$typeProjet->nametypeprojet] = $months->map(function ($month) use ($projectsByMonth, $typeProjet) {
+                return $projectsByMonth[$typeProjet->nametypeprojet]->get($month, 0);
+            });
+        }
+        
+        
+        return view('accueil', compact('competenceData', 'secteurData', 'totalEmployees', 'totalProjets','projectsData', 'months'));
     }
 
     public function getEmployeesWithNullDisponibilite()
     {
         $employees = Employee::with(['tasks.sector', 'specialists.competence'])
-                             ->whereNull('disponibilite')
-                             ->get();
+        ->whereNull('disponibilite')
+        ->whereNull('deletemployee')
+        ->get();
     
         $employees = $employees->map(function ($employee) {
             return [

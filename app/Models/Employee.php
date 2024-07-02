@@ -14,6 +14,7 @@ class Employee extends Model
         'nom',
         'telephone',
         'email',
+        'deletemployee',
         'profile',
         'disponibilite'
     ];

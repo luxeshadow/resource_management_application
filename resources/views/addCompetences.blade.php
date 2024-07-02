@@ -16,12 +16,12 @@
                     @csrf
                     <label class="form-label-wrapper">
                         <p class="form-label">Competence</p>
-                        <input name="namecompetence" class="form-input" placeholder=" Laravel...">
+                        <input style="text-transform: capitalize" name="namecompetence" class="form-input" placeholder=" Laravel..." autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <label class="form-label-wrapper">
                         <p class="form-label">Description</p>
-                        <input name="description" class="form-input" placeholder="Framework php">
+                        <input name="description" class="form-input" placeholder="Framework php" autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <button type="submit"
@@ -87,54 +87,60 @@
         });
 
         $(document).ready(function() {
-            $('#addCompetence').on('submit', function(event) {
-                event.preventDefault(); // Empêche la soumission par défaut du formulaire
-                console.log('Form submitted');
+    $('#addCompetence').on('submit', function(event) {
+        event.preventDefault(); // Empêche la soumission par défaut du formulaire
+        console.log('Form submitted');
 
-                var formData = new FormData(this);
+        var formData = new FormData(this);
 
-                $.ajax({
-                    url: '{{ route('competences.store') }}', // URL de la route définie dans Laravel
-                    type: 'POST',
-                    data: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        console.log('Success:', response);
-                        Swal.fire({
-                            position: "center",
-                            icon: "success",
-                            title: "Compétence enregistrée avec succès",
-                            showConfirmButton: false,
-                            timer: 1000
-                        });
-                        $('#addCompetence')[0].reset();
-                        loadCompetences(); // Recharger les compétences après ajout
-                    },
-                    error: function(xhr, status, error) {
-                        console.log('Error:', xhr.responseText);
-                        var errors = xhr.responseJSON.errors;
-                        if (errors) {
-                            // Afficher les erreurs dans le formulaire
-                            Object.keys(errors).forEach(function(key) {
-                                var errorMessage = errors[key][
-                                    0
-                                ]; // Prendre le premier message d'erreur
-                                $('[name="' + key + '"]').siblings('.error-message')
-                                    .html(errorMessage);
-                            });
-                            Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: "Une erreur est survenue"
-                            });
-                        }
-                    }
+        $.ajax({
+            url: '{{ route('competences.store') }}', // URL de la route définie dans Laravel
+            type: 'POST',
+            data: formData,
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                console.log('Success:', response);
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "Compétence enregistrée avec succès",
+                    showConfirmButton: false,
+                    timer: 1000
                 });
-            });
+                $('#addCompetence')[0].reset();
+                loadCompetences(); // Recharger les compétences après ajout
+            },
+            error: function(xhr, status, error) {
+                console.log('Error:', xhr.responseText);
+                var errors = xhr.responseJSON.errors;
+                if (errors) {
+                    var errorMessages = '';
+                    // Accumuler tous les messages d'erreur
+                    Object.keys(errors).forEach(function(key) {
+                        var errorMessage = errors[key][0]; // Prendre le premier message d'erreur
+                        errorMessages += errorMessage + '<br>';
+                    });
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        html: errorMessages // Utiliser HTML pour afficher plusieurs lignes
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Oops...",
+                        text: "Cette competence existe de"
+                    });
+                }
+            }
+        });
+    });
+
+
 
             $('.form-input').on('input', function() {
                 $(this).siblings('.error-message').html('');
