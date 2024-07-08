@@ -99,7 +99,7 @@ class ProjetController extends Controller
                 // Mettre à jour la colonne deletprojet à 1 si le statut est 'en cours' ou 'termine'
                 $projet->deletprojet = 1;
                 $projet->save();
-                return response()->json(['message' => 'Projet marqué comme supprimé avec succès'], 200);
+                return response()->json(['message' => 'Proje supprimé avec succès'], 200);
             } else {
                 return response()->json(['error' => 'Statut du projet non pris en charge'], 400);
             }

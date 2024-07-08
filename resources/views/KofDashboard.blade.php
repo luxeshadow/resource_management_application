@@ -154,8 +154,10 @@
                         <li>
                             <a href="##" style="cursor: text;"><span class="icon setting" aria-hidden="true"></span>Settings</a>
                         </li>
+                    </ul>
                       
-                                <li>
+                        <ul class="sidebar-body-menu">   
+                                     <li>
                                     <a href="{{ route('showprofile') }}">
                                    
                                         <span class="icon edit" aria-hidden="true"></span>
@@ -166,8 +168,7 @@
                                             
                                         </span>
                                     </a>
-                                </li>
-                             
+                                </li>       
                                
                     </ul>
 

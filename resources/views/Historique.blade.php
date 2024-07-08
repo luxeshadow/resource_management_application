@@ -18,9 +18,11 @@
 
    
     <div class="sign-up-form form col-lg-5" style="height: 5px;margin-left: 20px">
-       
-       
-        <input  id="search-input" class="form-input" placeholder="Recherche..." autocomplete="off">
+        <div style="margin-top: -40px">
+            <p class="form-label">Recherche</p>
+            <input  id="search-input" class="form-input" placeholder="Recherche..." autocomplete="off">
+        </div>
+
     
     </div>
     
@@ -88,7 +90,7 @@
                                         $competences = $assignation->employe->competences->pluck('namecompetence')->implode(', ');
                                     @endphp
                                     <tr>
-                                        <td style="padding-right: 30px;">{{ $assignation->employe->nom }}</td>
+                                        <td class="employee-name" style="padding-right: 30px;">{{ $assignation->employe->nom }}</td>
                                         <td style="padding-right: 30px;">{{ $assignation->employe->telephone }}</td>
                                         <td>{{ $sectors }}</td>
                                         <td>{{ $competences }}</td>
@@ -104,16 +106,27 @@
     <br>
     <script>
         // Fonction de recherche
-        $('#search-input').on('input', function() {
-            var searchTerm = $(this).val().toLowerCase();
-            $('.stat-cards-item').each(function() {
-                var projectName = $(this).find('.overflow-text').text().toLowerCase();
-                if (projectName.includes(searchTerm)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
+         // Fonction de recherche
+    $('#search-input').on('input', function() {
+        var searchTerm = $(this).val().toLowerCase();
+        $('.stat-cards-item').each(function() {
+            var projectName = $(this).find('.overflow-text').text().toLowerCase();
+            var showProject = projectName.includes(searchTerm);
+            
+            // Recherche par nom d'employé
+            $(this).find('.employee-name').each(function() {
+                var employeeName = $(this).text().toLowerCase();
+                if (employeeName.includes(searchTerm)) {
+                    showProject = true;
                 }
             });
+
+            if (showProject) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
         });
+    });
     </script>
 @endsection

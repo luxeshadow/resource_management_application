@@ -47,7 +47,9 @@
                 <label class="form-label-wrapper">
                     <p class="form-label">Mots de passe</p>
                     <input required class="form-input" type="password" id="password" name="password" placeholder="Saisissez votre mot de passe" autocomplete="off">
-                    <button style="background: none; font-size: 30px;color: #A39B9B" type="button" class="toggle-password">&#128065;</button>
+                    <button style="background: none; font-size: 30px;color: #A39B9B" type="button" class="toggle-password">&#128065;
+                        <span class="slash" style="position: absolute; width: 2px; height: 25px; background-color: #A39B9B; transform: rotate(45deg); top: 5px; right: 12px; display: none;"></span>
+                    </button>
                  
                 </label>
                 
@@ -66,13 +68,17 @@
     <script>
         const passwordInput = document.getElementById('password');
         const togglePasswordButton = document.querySelector('.toggle-password');
-
+        const slash = document.querySelector('.slash');
+    
         togglePasswordButton.addEventListener('click', () => {
             const type = passwordInput.type === 'password' ? 'text' : 'password';
             passwordInput.type = type;
-
-          
-
+    
+            if (type === 'text') {
+                slash.style.display = 'none';
+            } else {
+                slash.style.display = 'block';
+            }
         });
     </script>
    

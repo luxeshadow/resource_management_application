@@ -2,9 +2,9 @@
 @section('employer')
 
     <head>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-     <meta http-equiv="Pragma" content="no-cache" />
-     <meta http-equiv="Expires" content="0" />
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
 
         <script src="{{ asset('js/jquery.js') }}"></script>
         <script src="{{ asset('js/employee.js') }}"></script>
@@ -211,11 +211,11 @@
         {{-- --------------------------------- Fin Modal --------------------- --}}
 
         {{-- -------------------------- MODAL MODIFIER EMPLOYER ------------------------- --}}
+        {{-- -------------------------- MODAL ------------------------- --}}
         <section>
-
-            <div  id="editEmployeeModal" class="modal1">
-                <div style="margin-top: 15px;margin-bottom: 15px;" class="sign-up-form form container col-xl-6">
-                    <span class="close">&times;</span>
+            <div id="editEmployeeModal" class="modal1">
+                <div style="margin-top: 15px; margin-bottom: 15px;" class="sign-up-form form container col-xl-6">
+                    <span class="shut">&times;</span>
                     <form id="modifierEmployer">
                         @csrf
                         @method('PUT')
@@ -223,26 +223,128 @@
                         <label class="form-label-wrapper">
                             <p class="form-label">Nom Complet</p>
                             <input name="nom" id="edit-nom" class="form-input" type="text"
-                                placeholder="Entrer nom de l'employer">
+                                placeholder="Entrer nom de l'employé">
+                            
                             <div style="color: red;" class="error-message"></div>
                         </label>
                         <label class="form-label-wrapper">
                             <p class="form-label">Email</p>
-                            <input name="telephone" id="edit-telephone" class="form-input" placeholder="Enter le email" autocomplete="off" value="{{ old('email') }}">
+                            <input name="email" id="edit-email" class="form-input" type="email"
+                                placeholder="Entrer le email" autocomplete="off">
                             <div style="color: red;" class="error-message"></div>
                         </label>
                         <label class="form-label-wrapper">
-                            <p class="form-label">Telephone</p>
-                            <input name="email" id="edit-email" class="form-input" placeholder="Enter le telephone" autocomplete="off">
+                            <p class="form-label">Téléphone</p>
+                            <input name="telephone" id="edit-telephone" class="form-input" placeholder="Entrer le téléphone"
+                                autocomplete="off">
                             <div style="color: red;" class="error-message"></div>
                         </label>
-                  
+                        <fieldset id="editSelectedSecteursIds" class="form-label-wrapper">
+                            <legend class="form-label">Secteurs d'Activité:</legend>
+                            <div class="secteurs-container">
+                                <!-- Les secteurs seront insérés ici par JavaScript -->
+                            </div>
+                        </fieldset><br>
+                        <style>
+                            .secteurs-container {
+                                display: flex;
+                                flex-wrap: wrap;
+                                max-height: 200px; /* Exemple de hauteur maximale */
+                                overflow-y: auto; 
+                            }
+
+                            .secteurs-container label {
+                                flex: 1 1 calc(25% - 10px);
+                                /* 4 colonnes avec un espace de 10px */
+                                box-sizing: border-box;
+                                margin: 5px;
+                            }
+
+                            .secteurs-container label input {
+                                margin-right: 5px;
+                            }
+                        </style>
+
+                        <script>
+                            $(document).ready(function() {
+                                // Récupérer les secteurs d'activité au chargement de la page
+                                $.ajax({
+                                    url: '{{ route('sectors.index') }}', // Remplacez cette URL par l'URL correcte pour récupérer les secteurs
+                                    type: 'GET',
+                                    success: function(response) {
+                                        var secteursContainer = $('#editSelectedSecteursIds .secteurs-container');
+                                        secteursContainer.empty(); // Vider le conteneur avant de le remplir
+                                        response.forEach(function(secteur) {
+                                            var secteurCheckbox =
+                                                '<label class="form-label"><input  name="selectedSecteursIds" type="checkbox" value="' +
+                                                secteur
+                                                .id + '"> ' + secteur.namesector + '</label>';
+                                            secteursContainer.append(secteurCheckbox);
+                                        });
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Erreur lors de la récupération des secteurs:', error);
+                                    }
+                                });
+                            });
+                        </script>
+
+                        <fieldset id="editSelectedCompetencesIds" class="form-label-wrapper">
+                            <legend class="form-label">Compétences:</legend>
+                            <div class="competences-container">
+                                <!-- Les compétences seront insérées ici par JavaScript -->
+                            </div>
+                        </fieldset><br>
+
+                        <style>
+                            .competences-container {
+                                display: flex;
+                                flex-wrap: wrap;
+                                max-height: 200px; /* Exemple de hauteur maximale */
+                                overflow-y: auto; /* Activer le défilement vertical */
+                            }
+
+                            .competences-container label {
+                                flex: 1 1 calc(25% - 10px);
+                                /* 4 colonnes avec un espace de 10px */
+                                box-sizing: border-box;
+                                margin: 5px;
+                            }
+
+                            .competences-container label input {
+                                margin-right: 5px;
+                            }
+                        </style>
+
+                        <script>
+                            $(document).ready(function() {
+                                $.ajax({
+                                    url: '{{ route('competences.index') }}', // Remplacez cette URL par l'URL correcte pour récupérer les compétences
+                                    type: 'GET',
+                                    success: function(response) {
+                                        var competencesContainer = $('#editSelectedCompetencesIds .competences-container');
+                                        competencesContainer.empty(); // Vider le conteneur avant de le remplir
+                                        response.forEach(function(competence) {
+                                            var competenceCheckbox =
+                                                '<label class="form-label"><input name="selectedCompetencesIds" type="checkbox" value="' +
+                                                competence.id + '"> ' + competence.namecompetence + '</label>';
+                                            competencesContainer.append(competenceCheckbox);
+                                        });
+                                    },
+                                    error: function(xhr, status, error) {
+                                        console.error('Erreur lors de la récupération des compétences:', error);
+                                    }
+                                });
+                            });
+                        </script>
+
                         <button type="submit" class="form-btn primary-default-btn transparent-btn col-md-8">Modifier
-                            Employer</button>
+                            l'employé</button>
                     </form>
                 </div>
             </div>
         </section>
+
         {{-- --------------------------------- Fin Modal Modifier --------------------- --}}
 
         <h1 class="main-title" style="margin-top: 10px; font-size: 22px; margin:5px">{{ __('messages.ademp') }}</h1><br>
@@ -356,54 +458,112 @@
                     }
                 });
 
-                //modifier
+                //modifier un employer..............................................//
                 $(document).on('click', '.btn-edit', function() {
-                        var employeeId = $(this).data('id');
-                        $('#editEmployeeModal').show();
-                        
-
-            // Utiliser AJAX pour récupérer les données de l'employé à modifier
-            $.ajax({
-                url: '/get_employee_data/' + employeeId, // Remplacez cette URL par l'URL de votre endpoint pour récupérer les données de l'employé
-                type: 'GET',
-                success: function(response) {
-                    // Pré-remplir les champs du formulaire de modification avec les données de l'employé
-                    $('#edit_employee_id').val(response.id);
-                    $('#edit_name').val(response.nom);
-                    $('#edit_telephone').val(response.telephone);
-                    $('#edit_email').val(response.email);
-
-                    // Pré-cocher les secteurs d'activité sélectionnés
-                    var selectedSecteursIds = response.selectedSecteursIds.split(',');
-                    selectedSecteursIds.forEach(function(secteurId) {
-                        $('#editSelectedSecteursIds input[value="' + secteurId + '"]').prop('checked', true);
-                    });
-
-                    // Pré-cocher les compétences sélectionnées
-                    var selectedCompetencesIds = response.selectedCompetencesIds.split(',');
-                    selectedCompetencesIds.forEach(function(competenceId) {
-                        $('#editSelectedCompetencesIds input[value="' + competenceId + '"]').prop('checked', true);
-                    });
-
-                    // Ouvrir le modal de modification
+                    var employeeId = $(this).data('id');
                     $('#editEmployeeModal').show();
-                },
-                error: function(xhr, status, error) {
-                    console.error('Erreur lors de la récupération des données de l\'employé à modifier:', error);
-                }
-            });
-            $('.close').click(function() {
-        $('#editEmployeeModal').hide();
-    });
-        });
-        
+
+                    // Utiliser AJAX pour récupérer les données de l'employé à modifier
+                    $.ajax({
+                        url: 'employees/' + employeeId + '/edit',
+                        type: 'GET',
+                        success: function(response) {
+                            // Pré-remplir les champs du formulaire de modification avec les données de l'employé
+                            $('#edit-employee-id').val(response.id);
+                            $('#edit-nom').val(response.nom);
+                            $('#edit-telephone').val(response.telephone);
+                            $('#edit-email').val(response.email);
+
+                            // Pré-cocher les secteurs d'activité sélectionnés
+                            var selectedSecteursIds = response.selectedSecteursIds ? response
+                                .selectedSecteursIds.split(',') : [];
+                            selectedSecteursIds.forEach(function(secteurId) {
+                                $('#editSelectedSecteursIds input[value="' + secteurId +
+                                    '"]').prop('checked', true);
+                            });
+
+                            // Pré-cocher les compétences sélectionnées
+                            var selectedCompetencesIds = response.selectedCompetencesIds ? response
+                                .selectedCompetencesIds.split(',') : [];
+                            selectedCompetencesIds.forEach(function(competenceId) {
+                                $('#editSelectedCompetencesIds input[value="' +
+                                    competenceId + '"]').prop('checked', true);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.error(
+                                'Erreur lors de la récupération des données de l\'employé à modifier:',
+                                error);
+                        }
+                    });
+                });
+
+                // Fermer le modal lorsque le bouton de fermeture est cliqué
+
+                $('.shut').click(function() {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Information',
+                        text: 'Annuler la Modification'
+                    }).then(function() {
+                        $('#editEmployeeModal').hide();
+                    });
+                });
+
+                // Soumission du formulaire de mise à jour de l'employé
+                $('#modifierEmployer').submit(function(event) {
+                    event.preventDefault();
+                    var employeeId = $('#edit-employee-id').val();
+
+                    // Collecte des données du formulaire avec le jeton CSRF inclus
+                    var formData = {
+                        _token: '{{ csrf_token() }}', // Inclure le jeton CSRF
+                        id: employeeId,
+                        nom: $('#edit-nom').val(),
+                        telephone: $('#edit-telephone').val(),
+                        email: $('#edit-email').val(),
+                        selectedSecteursIds: $('#editSelectedSecteursIds input:checked').map(function() {
+                            return $(this).val();
+                        }).get().join(','),
+                        selectedCompetencesIds: $('#editSelectedCompetencesIds input:checked').map(
+                        function() {
+                            return $(this).val();
+                        }).get().join(',')
+                    };
+
+                    // Envoi de la requête AJAX pour la mise à jour de l'employé
+                    $.ajax({
+                        url: 'employees/' + employeeId,
+                        type: 'PUT',
+                        data: formData,
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Succès',
+                                text: 'Employé mis à jour avec succès'
+                            }).then(function() {
+                                $('#editEmployeeModal').hide();
+                            });
+
+                        },
+                        error: function(xhr, status, error) {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Erreur',
+                                text: 'Verifier si tout les champs ont été remplis'
+                            });
+                            console.error('Erreur lors de la mise à jour de l\'employé:', error);
+                        }
+                    });
+                });
+
 
                 //suprimer
 
                 $(document).on('click', '.btn-del', function() {
                     var id = $(this).data('id');
                     var row = $(this).closest('tr');
-                   
+
                     Swal.fire({
                         title: "Etes vous sure?",
                         text: "Vous allez supprimer un employer!",
@@ -424,7 +584,7 @@
 
                                 success: function(response) {
                                     allEmployers = allEmployers.filter(emp => emp.id !==
-                                    id);
+                                        id);
                                     row.remove();
                                     setupPagination(allEmployers.length);
                                     var startIndex = (currentPage - 1) * itemsPerPage;
@@ -444,17 +604,17 @@
                                         'Erreur lors de la suppression de l\'employé:',
                                         error);
                                     Swal.fire({
-                                    icon: "error",
-                                    title: "Oops...",
-                                    text: " l\'employé ne peut etre suprimer car il est actuellement assigner a un projet pour le suprimer veuillez d'abord revoquer son assignation"
-                                });
+                                        icon: "error",
+                                        title: "Oops...",
+                                        text: " l\'employé ne peut etre suprimer car il est actuellement assigner a un projet pour le suprimer veuillez d'abord revoquer son assignation"
+                                    });
                                 }
                             });
                         }
 
                     });
                 });
-         
+
                 loadEmployers();
                 // Fonction pour charger et afficher les employeurs
                 let allEmployers = [];
@@ -639,7 +799,8 @@
                     </label>
                     <label class="form-label-wrapper">
                         <p class="form-label">Email</p>
-                        <input name="email" class="form-input" type="email" placeholder="Entrer l'email" autocomplete="off">
+                        <input name="email" class="form-input" type="email" placeholder="Entrer l'email"
+                            autocomplete="off">
                         <div style="color: red;" class="error-message"></div>
                     </label>
                     <div class="form-label">

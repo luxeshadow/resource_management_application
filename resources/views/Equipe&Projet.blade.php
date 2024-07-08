@@ -340,14 +340,14 @@
                         const assignationId = $(this).data('id');
 
                         Swal.fire({
-                            title: 'Are you sure?',
-                            text: "You won't be able to revert this!",
+                            title: 'Êtes-vous sûr?',
+                            text: "De vouloir effectuer cette suppression!",
                             icon: 'warning',
                             showCancelButton: true,
                             confirmButtonColor: '#3085d6',
                             cancelButtonColor: '#d33',
-                            confirmButtonText: 'Yes, delete it!',
-                            cancelButtonText: 'Cancel'
+                            confirmButtonText: 'Oui, je le souhaite!',
+                            cancelButtonText: 'Annuler'
                         }).then((result) => {
                             if (result.isConfirmed) {
                                 $.ajax({
@@ -359,8 +359,8 @@
                                     },
                                     success: function(response) {
                                         if (response.success) {
-                                            Swal.fire('Deleted!',
-                                                'The assignment has been deleted.',
+                                            Swal.fire('Suprimer!',
+                                                'Employer retire du projet avec success.',
                                                 'success');
                                             var row = $(button).closest('tr');
                                             row.remove();
@@ -369,13 +369,13 @@
                                             ); // Recharge les employés après la suppression réussie
                                         } else {
                                             Swal.fire('Error!',
-                                                'An error occurred while deleting.',
+                                                'Une erreur es survenue pendant la revocation.',
                                                 'error');
                                         }
                                     },
                                     error: function() {
                                         Swal.fire('Error!',
-                                            'An error occurred while deleting.', 'error'
+                                            'Une erreur est survenue pendant la revocation.', 'error'
                                         );
                                     }
                                 });

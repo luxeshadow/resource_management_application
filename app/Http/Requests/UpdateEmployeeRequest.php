@@ -29,8 +29,10 @@ class UpdateEmployeeRequest extends FormRequest
             'nom' => 'required|string|max:255',
             'telephone' => 'required|string|max:20',
             'email' => 'required|email|max:255|unique:employees,email,' . $this->route('employee')->id,
-            'secteur' => 'required|string|max:255',
-            'competence' => 'required|string|max:255',
+           'selectedSecteursIds.*' => 'required|exists:sectors,id',
+           'selectedCompetencesIds.*' => 'required|exists:competences,id',
+           'selectedCompetencesIds' => 'required',
+
         ];
     }
 
@@ -46,8 +48,8 @@ class UpdateEmployeeRequest extends FormRequest
         'email.required' => 'L\'email est obligatoire.',
         'email.email' => 'Veuillez entrer une adresse email valide.',
         'email.unique' => 'Cet email est déjà utilisé.',
-        'secteur.required' => 'Le secteur d\'activité est obligatoire.',
-        'competence.required' => 'Les compétences sont obligatoires.',
+        'selectedSecteursIds.required' => 'Les secteurs sont obligatoires.',
+        'selectedCompetencesIds.required' => 'Les compétences sont obligatoires.',
        ];
    }
 

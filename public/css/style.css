@@ -337,6 +337,19 @@ label:hover{
   text-decoration: none;
   cursor: pointer;
 }
+.shut {
+  color: #8d8b8b;
+  float: right;
+  font-size: 50px;
+  font-weight: bold;
+  margin-right: 10px;
+}
+.shut:hover,
+.shut:focus {
+  color: blue;
+  text-decoration: none;
+  cursor: pointer;
+}
 
 .close:hover,
 .close:focus {

@@ -26,7 +26,7 @@ class StoreSectorRequest extends FormRequest
     {
         return [
             //
-            'namesector' => 'required|string|max:255|min:5|unique:sectors,namesector',
+            'namesector' => 'required|string|max:255|min:2|unique:sectors,namesector',
             'description' => 'required|string|max:255',
         ];
     }

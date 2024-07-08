@@ -215,7 +215,7 @@
         <button title="Suprimer" class="btn-del" data-id="${projet.id}"><img src="img/delete.png" alt="" style="width:23px; height:23px;"></button>
         <span class="sr-only">Suprimer</span>
         <button class="btn-edit" data-id="${projet.id}"><img src="img/edi.png" alt="" style="width: 25px; height:25px;"></button>
-        <button id="openModalBtn" class="btn-profile" data-id="${projet.id}"><img  src="img/view.png" alt="" style="width: 23px;height:23px"></button>
+        <button id="openModalBtn" class="btn-profile" data-id="${projet.id}"><img  src="img/view.png" alt="" style="width: 24px;height:27px"></button>
        
     </td>
 </tr>

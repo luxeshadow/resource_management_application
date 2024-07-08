@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
 use App\Models\Projet;
+use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
@@ -22,9 +23,9 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::with(['tasks.sector'])
-        ->whereNull('deletemployee')
-        ->orderBy('created_at', 'desc')
-        ->get();
+            ->whereNull('deletemployee')
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         // Préparez les données pour la réponse JSON
         $employeesData = $employees->map(function ($employee) {
@@ -143,7 +144,10 @@ class EmployeeController extends Controller
         }
     }
 
-
+    public function edit(Employee $employee)
+    {
+        return response()->json($employee);
+    }
     public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
         try {
@@ -151,32 +155,38 @@ class EmployeeController extends Controller
             $employee->update($request->except(['selectedSecteursIds', 'selectedCompetencesIds']));
 
             // Mettre à jour les secteurs associés à l'employé dans la table associative
-            $secteurs = explode(',', $request->selectedSecteursIds);
-            $employee->tasks()->sync($secteurs);
+            $secteurs = $request->selectedSecteursIds ? explode(',', $request->selectedSecteursIds) : [];
+            $employee->sectors()->sync($secteurs);
 
             // Mettre à jour les compétences associées à l'employé dans la table associative
-            $competences = explode(',', $request->selectedCompetencesIds);
-            $employee->specialists()->sync($competences);
+            $competences = $request->selectedCompetencesIds ? explode(',', $request->selectedCompetencesIds) : [];
+            $employee->competences()->sync($competences);
 
             return response()->json(['message' => 'Employé mis à jour avec succès']);
         } catch (\Exception $e) {
-            // Gérer l'exception et retourner un message d'erreur
+            // Journaliser l'erreur pour un diagnostic ultérieur
+            Log::error('Erreur lors de la mise à jour de l\'employé: ' . $e->getMessage());
+
+            // Retourner une réponse JSON avec un message d'erreur
             return response()->json(['error' => 'Erreur lors de la mise à jour de l\'employé', 'details' => $e->getMessage()], 500);
         }
     }
 
+
+
+
     public function destroy(Employee $employee)
     {
         if (is_null($employee->disponibilite)) {
-            $employee->increment('deletemployee');
-            return response()->json(['message' => 'Le statut de suppression de l\'employé a été mis à jour avec succès']);
+            $employee->deletemployee += 1;
+            $employee->save();
+            return response()->json(['message' => 'Le statut de suppression de l\'employé a été éffectué avec succès']);
         } else {
             return response()->json(['message' => 'L\'employé ne peut pas être supprimé car il est assigné à un projet actuellement'], 500);
         }
-       
     }
 
-    
+
 
     //////
     public function getDashboardData()
@@ -184,25 +194,34 @@ class EmployeeController extends Controller
         // Compétences
         $competences = Competence::pluck('namecompetence', 'id');
         $competenceData = [];
+
         foreach ($competences as $competenceId => $competenceNom) {
-            $competenceData[$competenceNom] = Specialist::where('competence_id', $competenceId)->count();
+            $competenceData[$competenceNom] = Specialist::where('competence_id', $competenceId)
+                ->join('employees', 'specialists.employe_id', '=', 'employees.id')
+                ->whereNull('employees.deletemployee') // S'assurer que les employés supprimés sont pris en compte
+                ->count();
         }
+
 
         // Secteurs
         $secteurs = Sector::pluck('namesector', 'id');
         $secteurData = [];
+
         foreach ($secteurs as $secteurId => $secteurNom) {
-            $secteurData[$secteurNom] = Task::where('sector_id', $secteurId)->count();
+            $secteurData[$secteurNom] = Task::where('sector_id', $secteurId)
+                ->join('employees', 'tasks.employe_id', '=', 'employees.id')
+                ->whereNull('employees.deletemployee') // S'assurer que seuls les employés non supprimés sont pris en compte
+                ->count();
         }
 
         $totalEmployees = Employee::whereNull('deletemployee')->count();
         $totalProjets = Projet::whereNull('deletprojet')->count();
 
-       
+
         $typesProjets = TypeProjet::all();
 
         $projectsByMonth = [];
-        
+
         foreach ($typesProjets as $typeProjet) {
             $projectsByMonth[$typeProjet->nametypeprojet] = Projet::where('typeprojet', $typeProjet->id)
                 ->selectRaw('DATE_FORMAT(created_at, "%Y-%m") as month, count(*) as total')
@@ -210,32 +229,32 @@ class EmployeeController extends Controller
                 ->get()
                 ->pluck('total', 'month');
         }
-        
+
         // Création d'un tableau de mois pour l'affichage sur l'axe x du graphique
         $months = collect(range(1, 12))->map(function ($month) {
             return now()->startOfYear()->addMonths($month - 1)->format('Y-m');
         });
-        
+
         // Création des séries de données pour le graphique
         $projectsData = [];
-        
+
         foreach ($typesProjets as $typeProjet) {
             $projectsData[$typeProjet->nametypeprojet] = $months->map(function ($month) use ($projectsByMonth, $typeProjet) {
                 return $projectsByMonth[$typeProjet->nametypeprojet]->get($month, 0);
             });
         }
-        
-        
-        return view('accueil', compact('competenceData', 'secteurData', 'totalEmployees', 'totalProjets','projectsData', 'months'));
+
+
+        return view('accueil', compact('competenceData', 'secteurData', 'totalEmployees', 'totalProjets', 'projectsData', 'months'));
     }
 
     public function getEmployeesWithNullDisponibilite()
     {
         $employees = Employee::with(['tasks.sector', 'specialists.competence'])
-        ->whereNull('disponibilite')
-        ->whereNull('deletemployee')
-        ->get();
-    
+            ->whereNull('disponibilite')
+            ->whereNull('deletemployee')
+            ->get();
+
         $employees = $employees->map(function ($employee) {
             return [
                 'id' => $employee->id,
@@ -247,10 +266,7 @@ class EmployeeController extends Controller
                 'email' => $employee->email,
             ];
         });
-    
+
         return response()->json($employees);
     }
-    
-    
-    
 }
