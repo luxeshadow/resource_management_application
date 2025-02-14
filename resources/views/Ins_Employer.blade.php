@@ -227,6 +227,7 @@
                             
                             <div style="color: red;" class="error-message"></div>
                         </label>
+                        
                         <label class="form-label-wrapper">
                             <p class="form-label">Email</p>
                             <input name="email" id="edit-email" class="form-input" type="email"
@@ -497,7 +498,7 @@
                         }
                     });
                 });
-
+                
                 // Fermer le modal lorsque le bouton de fermeture est cliqué
 
                 $('.shut').click(function() {
@@ -541,9 +542,12 @@
                                 icon: 'success',
                                 title: 'Succès',
                                 text: 'Employé mis à jour avec succès'
+                                
                             }).then(function() {
                                 $('#editEmployeeModal').hide();
+                               
                             });
+                            loadEmployers();
 
                         },
                         error: function(xhr, status, error) {
@@ -553,6 +557,7 @@
                                 text: 'Verifier si tout les champs ont été remplis'
                             });
                             console.error('Erreur lors de la mise à jour de l\'employé:', error);
+                            
                         }
                     });
                 });
@@ -561,6 +566,7 @@
                 //suprimer
 
                 $(document).on('click', '.btn-del', function() {
+                    
                     var id = $(this).data('id');
                     var row = $(this).closest('tr');
 
@@ -777,7 +783,9 @@
                 });
 
             });
-        </script>
+        </script> 
+     
+        
 
         <div class="row col-xl-12">
 

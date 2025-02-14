@@ -50,7 +50,7 @@
 
 
                 </label>
-            </div>
+        </div>
             <script>
                 $(document).ready(function() {
                     $.ajax({

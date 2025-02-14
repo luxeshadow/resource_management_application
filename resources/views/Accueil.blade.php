@@ -134,6 +134,7 @@
                     <div class="chart">
                         <canvas id="projectComparisonChart" width="800" height="400"></canvas>
                     </div>
+                   
                 </div>
             </div>
         </div>
@@ -169,7 +170,6 @@
                     'rgba(40, 209, 19, 1)', // Vert
                     'rgba(255, 99, 132, 1)', // Rouge
                     'rgba(255, 69, 0, 1)', // Rouge orange
-                    'rgba(100, 10, 155, 100)', // Violet
                     'rgba(25, 15, 6, 1)', // Orange
                     'rgba(11, 11, 10, 1)', // Gris
                     'rgba(0, 255, 127, 1)', // Vert de printemps

@@ -56,7 +56,7 @@
                 <label id="add-img-label" for="add-single-img">
                     <p>+</p><img id="preview-image" alt="Selected Image Preview" style="display: none;">
                 </label>
-                <input class="form-input" name="photo" type="file" id="add-single-img" accept="image/jpeg" />
+                <input required class="form-input" name="photo" type="file" id="add-single-img" accept="image/jpeg" />
             </div>
             
             <!-- Ajoutez d'autres champs de formulaire si nécessaire -->

@@ -14,7 +14,7 @@
     </style>
     <br>
     <h2 title="titre" style="background: none;display: flex;margin-left: 30px">
-        <img src="{{ asset('img/file.png') }}" alt="" style="width:60px; height:60px;">
+        <img src="{{ asset('img/fille.png') }}" alt="" style="width:60px; height:60px;">
         <p class="stat-cards-info__num" style="margin-top: 10px;font-weight: 700;font-size: 25px">
             Projets et Suivit
         </p>
@@ -341,7 +341,7 @@
 
                         Swal.fire({
                             title: 'Êtes-vous sûr?',
-                            text: "De vouloir effectuer cette suppression!",
+                            text: "De vouloir retirer cet employer du projet!",
                             icon: 'warning',
                             showCancelButton: true,
                             confirmButtonColor: '#3085d6',

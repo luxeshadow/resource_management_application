@@ -66,6 +66,8 @@ class ProjetController extends Controller
     public function show(Projet $projet)
     {
         //
+        $projet = $projet->load('tasks.sector', 'specialists.competence');
+      
     }
 
     /**
@@ -74,6 +76,7 @@ class ProjetController extends Controller
     public function edit(Projet $projet)
     {
         //
+        return response()->json($projet);
     }
 
     /**
@@ -82,6 +85,24 @@ class ProjetController extends Controller
     public function update(UpdateProjetRequest $request, Projet $projet)
     {
         //
+        try {
+            // Mettre à jour les données de base du projet
+            $projet->update($request->except(['typeprojet']));
+    
+            // Mettre à jour le type de projet associé
+            if ($request->has('typeprojet')) {
+                $projet->typeprojet = $request->typeprojet;
+                $projet->save();
+            }
+    
+            return response()->json(['message' => 'Projet mis à jour avec succès', 'projet' => $projet]);
+        } catch (\Exception $e) {
+            // Journaliser l'erreur pour un diagnostic ultérieur
+            Log::error('Erreur lors de la mise à jour du projet: ' . $e->getMessage());
+    
+            // Retourner une réponse JSON avec un message d'erreur
+            return response()->json(['error' => 'Erreur lors de la mise à jour du projet', 'details' => $e->getMessage()], 500);
+        }
     }
 
     /**

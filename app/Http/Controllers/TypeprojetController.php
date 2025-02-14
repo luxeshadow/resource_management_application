@@ -50,7 +50,7 @@ public function listetypeprojet()
      */
 
         //
-        public function store(StoreTypeprojetRequest $request)
+    public function store(StoreTypeprojetRequest $request)
 {
     try {
         // Vérifier si le type de projet existe déjà

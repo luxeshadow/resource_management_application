@@ -74,6 +74,7 @@ Route::middleware('auth','nocache')->group(function () {
     Route::resource('users', UserController::class);
 });
 
+// Route::get('/register', [UserController::class, 'create']);
 
 
 /*
